@@ -1,0 +1,18 @@
+language: ruby
+bundler_args: --without guard
+rvm:
+  - "2.3.0"
+  - ruby-head
+script: "bundle exec rspec"
+addons:
+  code_climate:
+    repo_token: a36151a91a3f70083cbdb99e00dbf75ca91cafb910ad38d0e413c84063872f32
+branches:
+  only: master
+notifications:
+  email: false
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - rvm: ruby-head
