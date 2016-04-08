@@ -4,7 +4,7 @@ class ActionCableClient
 
     # @param [String] channel - the name of the subscribed channel
     def initialize(channel)
-      _channel = channel
+      @_channel = channel
     end
 
     # @param [String] command - the type of message that this is
@@ -12,7 +12,7 @@ class ActionCableClient
     # @param [Hash] message - the data to send
     def create(command, action, message = nil)
       data = build_data(action, message)
-      Message.new(command, identfier, data)
+      Message.new(command, identifier, data)
     end
 
     # @param [String] action - the action that is performed to send this message
@@ -22,7 +22,7 @@ class ActionCableClient
       message.merge({ action: action }) if message.is_a?(Hash)
     end
 
-    def identfier
+    def identifier
       { channel: _channel }
     end
 
