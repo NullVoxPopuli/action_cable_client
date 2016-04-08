@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 class ActionCableClient
-  VERSION = 1.0
+  VERSION = '0.5'
 end
