@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ActionCableClient
   class MessageFactory
     attr_reader :_channel
@@ -19,12 +20,11 @@ class ActionCableClient
     # @param [Hash] message - the data to send
     # @return [Hash] The data that will be included in the message
     def build_data(action, message)
-      message.merge({ action: action }) if message.is_a?(Hash)
+      message.merge(action: action) if message.is_a?(Hash)
     end
 
     def identifier
       { channel: _channel }
     end
-
   end
 end

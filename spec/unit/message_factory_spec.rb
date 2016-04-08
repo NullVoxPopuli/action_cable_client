@@ -1,8 +1,7 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe ActionCableClient::MessageFactory do
-
-
   it 'initializes with a channel name' do
     factory = ActionCableClient::MessageFactory.new('chatroom')
 
@@ -14,13 +13,13 @@ describe ActionCableClient::MessageFactory do
       factory = ActionCableClient::MessageFactory.new('chatroom')
       result = factory.build_data('hi', {})
 
-      expected = { action: 'hi'}
+      expected = { action: 'hi' }
       expect(result).to eq expected
     end
 
     it 'returns a constructed hash, given a message' do
       factory = ActionCableClient::MessageFactory.new('chatroom')
-      result = factory.build_data('hi', { a: 1 })
+      result = factory.build_data('hi', a: 1)
 
       expected = { action: 'hi', a: 1 }
       expect(result).to eq expected
@@ -30,7 +29,7 @@ describe ActionCableClient::MessageFactory do
   it 'builds the identifier based off the channel name' do
     factory = ActionCableClient::MessageFactory.new('chatroom')
 
-    expected =  { channel: 'chatroom' }
+    expected = { channel: 'chatroom' }
     expect(factory.identifier).to eq expected
   end
 
@@ -38,9 +37,8 @@ describe ActionCableClient::MessageFactory do
     it 'creates a message' do
       factory = ActionCableClient::MessageFactory.new('chatroom')
 
-      msg = factory.create('message', 'speak', { data: 1 })
+      msg = factory.create('message', 'speak', data: 1)
       expect(msg).to be_a_kind_of(ActionCableClient::Message)
     end
   end
-
 end

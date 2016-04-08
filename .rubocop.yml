@@ -4,6 +4,7 @@ AllCops:
     - !ruby/regexp /(vendor|bundle|bin|db|tmp)\/.*/
   DisplayCopNames: true
   DisplayStyleGuide: true
+  TargetRubyVersion: 2.3
 
 Lint/NestedMethodDefinition:
   Enabled: false

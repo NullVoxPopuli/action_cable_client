@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 # required gems
 require 'websocket-eventmachine-client'
 require 'json'
@@ -6,13 +7,11 @@ require 'json'
 require 'action_cable_client/message_factory'
 require 'action_cable_client/message'
 
-
 class ActionCableClient
   class Commands
     SUBSCRIBE = 'subscribe'
     MESSAGE = 'message'
   end
-
 
   attr_reader :_websocket_client, :_uri, :_channel_name
   attr_reader :_message_factory
@@ -54,7 +53,7 @@ class ActionCableClient
   end
 
   # Actions!
-  def method_missing(method, *args, &block)
+  def method_missing(method, *args)
     _send(message: args, action: method)
   end
 end

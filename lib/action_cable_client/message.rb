@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 class ActionCableClient
   class Message
     attr_reader :_command, :_identifier, :_data

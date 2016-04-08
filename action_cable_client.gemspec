@@ -1,9 +1,9 @@
 # -*- encoding: utf-8 -*-
+# frozen_string_literal: true
 
 # allows bundler to use the gemspec for dependencies
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
-
 
 require 'action_cable_client/version'
 
@@ -21,7 +21,7 @@ Gem::Specification.new do |s|
   s.files        = Dir['CHANGELOG.md', 'LICENSE' 'MIT-LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'
 
-  s.test_files    = s.files.grep(%r{^(test|spec|features)/})
+  s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
   s.required_ruby_version = '>= 2.3.0'
 

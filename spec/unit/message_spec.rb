@@ -1,10 +1,11 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe ActionCableClient::Message do
   it 'sets the attributes' do
     command = 'c',
-    identfier = {}
-    data = {d:2}
+              identfier = {}
+    data = { d: 2 }
     msg = ActionCableClient::Message.new(command, identfier, data)
 
     expect(msg._command).to eq command
@@ -14,8 +15,8 @@ describe ActionCableClient::Message do
 
   it 'double to_json\'s the identifier and the data' do
     command = 'hi',
-    identifier = {"hi": "there"},
-    data = {"data": "boo"}
+              identifier = { "hi": 'there' },
+              data = { "data": 'boo' }
 
     expected = {
       command: command,
