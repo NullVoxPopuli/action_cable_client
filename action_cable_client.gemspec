@@ -16,7 +16,7 @@ Gem::Specification.new do |s|
   s.email       = 'LPSego3+dev@gmail.com'
   s.homepage    = 'https://github.com/NullVoxPopuli/action_cable_client'
   s.summary     = "ActionCableClient-#{ActionCableClient::VERSION}"
-  s.description = ''
+  s.description = "A ruby client for interacting with Rails' ActionCable"
 
   s.files        = Dir['CHANGELOG.md', 'LICENSE' 'MIT-LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'
