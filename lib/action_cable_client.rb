@@ -21,11 +21,12 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue
+  attr_accessor :message_queue, :subscribed
+
+  alias_method :subscribed?, :subscribed
 
   def_delegator :_websocket_client, :disconnect, :disconnected
   def_delegator :_websocket_client, :errback, :errored
-  def_delegator :_websocket_client, :stream, :received
   def_delegator :_websocket_client, :connection_completed, :connected?
   def_delegator :_websocket_client, :send_msg, :send_msg
 
@@ -36,6 +37,7 @@ class ActionCableClient
     @_channel_name = channel
     @_uri = uri
     @message_queue = []
+    @subscribed = false
 
     @_message_factory = MessageFactory.new(channel)
     # NOTE:
@@ -55,8 +57,8 @@ class ActionCableClient
   # callback for received messages as well as
   # what triggers depleting the message queue
   #
-  # TODO: have a parameter on this methad that
-  #       by default doesn't yield the ping message
+  # @param [Boolean] skip_pings - by default, messages
+  #        with the identifier '_ping' are skipped
   #
   # @example
   #   client = ActionCableClient.new(uri, 'RoomChannel')
@@ -64,10 +66,18 @@ class ActionCableClient
   #     # the received message will be JSON
   #     puts message
   #   end
-  def received
+  def received(skip_pings = true)
     _websocket_client.stream do | message |
-      yield(message)
-      deplete_queue
+      string = message.data
+      json = JSON.parse(string)
+
+      if is_ping?(json)
+        check_for_subscribe_confirmation(json) unless subscribed?
+        yield(json) unless skip_pings
+      else
+        yield(json)
+      end
+      deplete_queue if subscribed?
     end
   end
 
@@ -86,6 +96,21 @@ class ActionCableClient
   end
 
   private
+
+  # {"identifier" => "_ping","type" => "confirm_subscription"}
+  def check_for_subscribe_confirmation(message)
+    message_type = message[Message::TYPE_KEY]
+    if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
+      self.subscribed = true
+    end
+  end
+
+  # {"identifier" => "_ping","message" => 1460201942}
+  # {"identifier" => "_ping","type" => "confirm_subscription"}
+  def is_ping?(message)
+    message_identifier = message[Message::IDENTIFIER_KEY]
+    Message::IDENTIFIER_PING == message_identifier
+  end
 
   def subscribe
     msg = _message_factory.create(Commands::SUBSCRIBE)

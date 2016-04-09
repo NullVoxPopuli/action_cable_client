@@ -23,6 +23,9 @@ class ActionCableClient
       message.merge(action: action) if message.is_a?(Hash)
     end
 
+    # the ending result should look like
+    # "{"channel":"RoomChannel"}" but that's up to
+    # the Mesage to format it
     def identifier
       { channel: _channel }
     end
