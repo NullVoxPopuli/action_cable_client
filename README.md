@@ -1,7 +1,10 @@
 # Action Cable Client
+[![Gem Version](https://badge.fury.io/rb/action_cable_client.svg)](https://badge.fury.io/rb/action_cable_client)
 [![Build Status](https://travis-ci.org/NullVoxPopuli/action_cable_client.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/action_cable_client)
 [![Code Climate](https://codeclimate.com/github/NullVoxPopuli/action_cable_client/badges/gpa.svg)](https://codeclimate.com/github/NullVoxPopuli/action_cable_client)
 [![Test Coverage](https://codeclimate.com/github/NullVoxPopuli/action_cable_client/badges/coverage.svg)](https://codeclimate.com/github/NullVoxPopuli/action_cable_client/coverage)
+[![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/action_cable_client.svg)](https://gemnasium.com/github.com/NullVoxPopuli/action_cable_client)
+
 
 There are quite a few WebSocket Servers out there. The popular ones seem to be: [faye-websocket-ruby](https://github.com/faye/faye-websocket-ruby), [em-websockets](https://github.com/igrigorik/em-websocket). The client-only websocket gems are kinda hard to find, and are only raw websocket support. Rails has a thin layer on top of web sockets to help manage subscribing to channels and send/receive on channels.
 
