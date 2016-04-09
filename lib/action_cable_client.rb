@@ -23,7 +23,7 @@ class ActionCableClient
   # [ action, data ]
   attr_accessor :message_queue, :subscribed
 
-  alias_method :subscribed?, :subscribed
+  alias subscribed? subscribed
 
   def_delegator :_websocket_client, :disconnect, :disconnected
   def_delegator :_websocket_client, :errback, :errored
@@ -67,7 +67,7 @@ class ActionCableClient
   #     puts message
   #   end
   def received(skip_pings = true)
-    _websocket_client.stream do | message |
+    _websocket_client.stream do |message|
       string = message.data
       json = JSON.parse(string)
 
@@ -100,9 +100,7 @@ class ActionCableClient
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def check_for_subscribe_confirmation(message)
     message_type = message[Message::TYPE_KEY]
-    if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
-      self.subscribed = true
-    end
+    self.subscribed = true if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
   end
 
   # {"identifier" => "_ping","message" => 1460201942}
@@ -118,7 +116,7 @@ class ActionCableClient
   end
 
   def deplete_queue
-    while (message_queue.size > 0)
+    until message_queue.empty?
       action, data = message_queue.pop
       msg = _message_factory.create(Commands::MESSAGE, action, data)
       send_msg(msg.to_json)

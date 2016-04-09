@@ -1,6 +1,7 @@
 AllCops:
   Exclude:
     - config/initializers/forbidden_yaml.rb
+    - action_cable_client.gemspec
     - !ruby/regexp /(vendor|bundle|bin|db|tmp)\/.*/
   DisplayCopNames: true
   DisplayStyleGuide: true

@@ -1,13 +1,12 @@
 # frozen_string_literal: true
 class ActionCableClient
   class Message
-    IDENTIFIER_KEY = 'identifier'.freeze
-    IDENTIFIER_PING = '_ping'.freeze
+    IDENTIFIER_KEY = 'identifier'
+    IDENTIFIER_PING = '_ping'
     # Type is never sent, but is received
     # TODO: find a better place for this constant
-    TYPE_KEY = 'type'.freeze
-    TYPE_CONFIRM_SUBSCRIPTION = 'confirm_subscription'.freeze
-
+    TYPE_KEY = 'type'
+    TYPE_CONFIRM_SUBSCRIPTION = 'confirm_subscription'
 
     attr_reader :_command, :_identifier, :_data
 

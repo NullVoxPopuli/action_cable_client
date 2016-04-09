@@ -1,11 +1,12 @@
+# frozen_string_literal: true
 require 'spec_helper'
 
 describe ActionCableClient::Message do
   context 'with empty WebSocketClient' do
     before(:each) do
-      allow(EventMachine::WebSocketClient).to receive(:connect){}
+      allow(EventMachine::WebSocketClient).to receive(:connect) {}
       @client = ActionCableClient.new('fakeuri')
-      allow(@client).to receive(:send_msg){}
+      allow(@client).to receive(:send_msg) {}
     end
 
     context '#perform' do
@@ -26,7 +27,7 @@ describe ActionCableClient::Message do
 
     context '#check_for_subscribe_confirmation' do
       it 'is a subscribtion confirmation' do
-        msg = {"identifier" => "_ping","type" => "confirm_subscription"}
+        msg = { 'identifier' => '_ping', 'type' => 'confirm_subscription' }
         @client.send(:check_for_subscribe_confirmation, msg)
         expect(@client.subscribed?).to eq true
       end
@@ -34,24 +35,22 @@ describe ActionCableClient::Message do
 
     context '#is_ping?' do
       it 'is a ping' do
-        msg = {"identifier" => "_ping","message" => 1460201942}
+        msg = { 'identifier' => '_ping', 'message' => 1_460_201_942 }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq true
       end
 
       it 'is a ping when it is a confirmation' do
-        msg = {"identifier" => "_ping","type" => "confirm_subscription"}
+        msg = { 'identifier' => '_ping', 'type' => 'confirm_subscription' }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq true
       end
 
       it 'is not a ping' do
-        msg = {"identifier" => "notping","message" => 1460201942}
+        msg = { 'identifier' => 'notping', 'message' => 1_460_201_942 }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq false
       end
     end
   end
-
-
 end
