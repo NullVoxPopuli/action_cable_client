@@ -1,23 +1,12 @@
 require 'action_cable_client'
 
-EM.run do
+EventMachine.run do
 
-  client = ActionCableClient.new("ws://localhost:3000/cable/", 'room_channel')
+  client = ActionCableClient.new("ws://localhost:3000/cable/", 'RoomChannel')
 
-  client.connected do
-    puts 'Connected Received'
+  client.received do | message |
+    puts message
   end
 
-  client.disconnected do
-    puts "Disconnected"
-  end  
-
-  client.received do | message, type |
-    puts "Received" + message + " " + type.to_s
-  end
-
-  client.errored do |e|
-    puts "Error: " + e.to_s
-  end
+  client.perform('speak', { message: 'hello from amc # 3' })
 end
-

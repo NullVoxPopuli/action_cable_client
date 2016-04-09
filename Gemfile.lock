@@ -1,9 +1,9 @@
 PATH
   remote: .
   specs:
-    action_cable_client (1.0)
+    action_cable_client (0.5)
       activesupport
-      websocket-eventmachine-client
+      em-websocket-client
 
 GEM
   remote: https://rubygems.org/
@@ -21,6 +21,9 @@ GEM
     coderay (1.1.1)
     diff-lcs (1.2.5)
     docile (1.1.5)
+    em-websocket-client (0.1.2)
+      eventmachine
+      websocket
     eventmachine (1.2.0.1)
     i18n (0.7.0)
     json (1.8.3)
@@ -68,13 +71,6 @@ GEM
       thread_safe (~> 0.1)
     unicode-display_width (1.0.3)
     websocket (1.2.3)
-    websocket-eventmachine-base (1.2.0)
-      eventmachine (~> 1.0)
-      websocket (~> 1.0)
-      websocket-native (~> 1.0)
-    websocket-eventmachine-client (1.1.0)
-      websocket-eventmachine-base (~> 1.0)
-    websocket-native (1.0.0)
 
 PLATFORMS
   ruby

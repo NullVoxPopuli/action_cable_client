@@ -13,11 +13,14 @@ class ActionCableClient
     end
 
     def to_json
-      {
+      hash = {
         command: _command,
-        identifier: _identifier.to_json,
-        data: _data.to_json
-      }.to_json
+        identifier: _identifier.to_json
+      }
+
+      hash[:data] = _data.to_json if _data.present?
+
+      hash.to_json
     end
   end
 end

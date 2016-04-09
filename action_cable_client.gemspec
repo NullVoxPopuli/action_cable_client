@@ -26,7 +26,7 @@ Gem::Specification.new do |s|
   s.required_ruby_version = '>= 2.3.0'
 
   s.add_runtime_dependency 'activesupport'
-  s.add_runtime_dependency 'websocket-eventmachine-client'
+  s.add_runtime_dependency 'em-websocket-client'
 
   s.add_development_dependency 'rspec'
   s.add_development_dependency 'pry-byebug'

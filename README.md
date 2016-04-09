@@ -9,27 +9,19 @@
 ```ruby
 require 'action_cable_client'
 
-#EM.run do
+EventMachine.run do
 
   client = ActionCableClient.new(
-    uri: 'ws://localhost:3000/cable/',
-    channel: 'my-channel'
-  )
+    "ws://localhost:3000/cable/",
+    'RoomChannel')
 
-
-  client.connected do
-
+  # called whenever a message is received from the server
+  client.received do | message |
+    puts message
   end
 
-  client.disconnected do
-
-  end
-
-  client.received do
-
-  end
-
-  client.speak, { message: 'Hello World'}
-
-#end
+  # adds to a queue that is purged upon receiving of
+  # a ping from the server
+  client.perform('speak', { message: 'hello from amc' })
+end
 ```
