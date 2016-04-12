@@ -37,8 +37,25 @@ end
 
 This example is compatible with [this version of a small Rails app with Action Cable](https://github.com/NullVoxPopuli/mesh-relay/tree/2ed88928d91d82b88b7878fcb97e3bd81977cfe8)
 
+
+
 The available hooks to tie in to are:
  - `disconnected {}`
  - `connected {}`
  - `errored { |msg| }`
  - `received { |msg }`
+
+## Demo
+
+[![Live Demo](http://img.youtube.com/vi/x9D1wWsVHMY/mqdefault.jpg)](http://www.youtube.com/watch?v=x9D1wWsVHMY&hd=1)
+
+Action Cable Client Demo on YouTube (1:41)
+
+
+## Contributing
+
+1. Fork it ( https://github.com/NullVoxPopuli/action_cable_client/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
