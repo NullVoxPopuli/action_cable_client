@@ -10,9 +10,39 @@ describe ActionCableClient::Message do
     end
 
     context '#perform' do
-      it 'adds to the queue' do
+      context 'queueing is enabled' do
+        before(:each) do
+          allow(@client).to receive(:_queued_send){ true }
+        end
+
+        it 'adds to the queue' do
+          @client.perform('action', {})
+          expect(@client.message_queue.count).to eq 1
+        end
+      end
+
+      it 'does not add to the queue' do
         @client.perform('action', {})
-        expect(@client.message_queue.count).to eq 1
+        expect(@client.message_queue.count).to eq 0
+      end
+
+      it 'dispatches the message' do
+        expect(@client).to receive(:dispatch_message){}
+        @client.perform('action', {})
+      end
+    end
+
+    context '#dispatch_message' do
+      it 'does not send if not subscribed' do
+        @client.subscribed = false
+        expect(@client).to_not receive(:send_msg)
+        @client.send(:dispatch_message, 'action', {})
+      end
+
+      it 'calls sends when subscribed' do
+        @client.subscribed = true
+        expect(@client).to receive(:send_msg){}
+        @client.send(:dispatch_message, 'action', {})
       end
     end
 

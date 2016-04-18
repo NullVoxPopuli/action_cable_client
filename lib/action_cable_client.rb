@@ -17,7 +17,7 @@ class ActionCableClient
     MESSAGE = 'message'
   end
 
-  attr_reader :_websocket_client, :_uri, :_channel_name
+  attr_reader :_websocket_client, :_uri, :_channel_name, :_queued_send
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
@@ -33,9 +33,12 @@ class ActionCableClient
   # @param [String] uri - e.g.: ws://domain:port
   # @param [String] channel - the name of the channel on the Rails server
   #                           e.g.: RoomChannel
-  def initialize(uri, channel = '')
+  # @param [Boolean] queued_send - optionally send messages after a ping
+  #                                is received, rather than instantly
+  def initialize(uri, channel = '', queued_send = false)
     @_channel_name = channel
     @_uri = uri
+    @_queued_send = queued_send
     @message_queue = []
     @subscribed = false
 
@@ -51,7 +54,11 @@ class ActionCableClient
   # @param [String] action - how the message is being sent
   # @param [Hash] data - the message to be sent to the channel
   def perform(action, data)
-    message_queue.push([action, data])
+    if _queued_send
+      message_queue.push([action, data])
+    else
+      dispatch_message(action, data)
+    end
   end
 
   # callback for received messages as well as
@@ -77,7 +84,8 @@ class ActionCableClient
       else
         yield(json)
       end
-      deplete_queue if subscribed?
+
+      deplete_queue if _queued_send
     end
   end
 
@@ -116,8 +124,19 @@ class ActionCableClient
   end
 
   def deplete_queue
-    until message_queue.empty?
-      action, data = message_queue.pop
+    # if we haven't yet subscribed, don't deplete the queue
+    if subscribed?
+      # only try to send if we have messages to send
+      until message_queue.empty?
+        action, data = message_queue.pop
+        dispatch_message(action, data)
+      end
+    end
+  end
+
+  def dispatch_message(action, data)
+    # can't send messages if we aren't subscribed
+    if subscribed?
       msg = _message_factory.create(Commands::MESSAGE, action, data)
       send_msg(msg.to_json)
     end
