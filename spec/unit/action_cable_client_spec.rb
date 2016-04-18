@@ -46,12 +46,35 @@ describe ActionCableClient::Message do
       end
     end
 
-    context '#deplete_queue' do
-      it 'clears the queue' do
-        @client.perform('action', {})
+    context '#subscribe' do
+      it 'sends a message' do
+        expect(@client).to receive(:send_msg){}
+        @client.send(:subscribe)
+      end
+    end
 
-        @client.send(:deplete_queue)
-        expect(@client.message_queue.count).to eq 0
+    context '#connected' do
+      it 'subscribes' do
+        # TODO: how do I stub a method chain that takes a block?
+        # allow{ |b| @client._websocket_client.callback }.to yield_with_no_args
+        # allow(@client).to receive_message_chain(:_websocket_client, :callback).and_yield(Proc.new{})
+        # expect(@client).to receive(:subscribe)
+        # @client.connected
+      end
+    end
+
+    context '#deplete_queue' do
+      context 'queuing is enabled' do
+        before(:each) do
+          allow(@client).to receive(:_queued_send){ true }
+          @client.subscribed = true
+        end
+        it 'clears the queue' do
+          @client.perform('action', {})
+
+          @client.send(:deplete_queue)
+          expect(@client.message_queue.count).to eq 0
+        end
       end
     end
 

@@ -120,7 +120,7 @@ class ActionCableClient
 
   def subscribe
     msg = _message_factory.create(Commands::SUBSCRIBE)
-    _websocket_client.send_msg(msg.to_json)
+    send_msg(msg.to_json)
   end
 
   def deplete_queue
