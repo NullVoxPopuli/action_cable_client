@@ -51,6 +51,7 @@ The available hooks to tie in to are:
 
 Action Cable Client Demo on YouTube (1:41)
 
+[Here is a set of files in a gist](https://gist.github.com/NullVoxPopuli/edfcbbe91a7877e445cbde84c7f05b37) that demonstrate how different `action_cable_client`s can communicate with eachother.
 
 ## Contributing
 
