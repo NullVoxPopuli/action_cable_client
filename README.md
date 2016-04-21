@@ -60,13 +60,13 @@ There really isn't that much to this gem. :-)
 1. Connect to the Action Cable URL
 2. After the connection succeeds, send a subscribe message
   - The subscribe message JSON should look like this
-    - {"command":"subscribe","identifier":"{\"channel\":\"MeshRelayChannel\"}"}
+    - `{"command":"subscribe","identifier":"{\"channel\":\"MeshRelayChannel\"}"}`
   - You should receive a message like this:
-    - {"identifier"=>"{\"channel\":\"MeshRelayChannel\"}", "type"=>"confirm_subscription"}
+    - `{"identifier"=>"{\"channel\":\"MeshRelayChannel\"}", "type"=>"confirm_subscription"}`
 3. Once subscribed, you can send messages.
   - Make sure that the command string matches the data-handling method name on your ActionCable server.
   - Your message JSON should look like this:
-    - {"command":"message","identifier":"{\"channel\":\"MeshRelayChannel\"}","data":"{\"to\":\"user1\",\"message\":\"hello from user2\",\"action\":\"chat\"}"}
+    - `{"command":"message","identifier":"{\"channel\":\"MeshRelayChannel\"}","data":"{\"to\":\"user1\",\"message\":\"hello from user2\",\"action\":\"chat\"}"}`
     - Received messages should look about the same
 
 4. The important thing to note is that every message sent to the server has a `command` and `identifier` key. Also, that `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
