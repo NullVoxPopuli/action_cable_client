@@ -53,6 +53,32 @@ Action Cable Client Demo on YouTube (1:41)
 
 [Here is a set of files in a gist](https://gist.github.com/NullVoxPopuli/edfcbbe91a7877e445cbde84c7f05b37) that demonstrate how different `action_cable_client`s can communicate with eachother.
 
+## The Action Cable Protocol
+
+There really isn't that much to this gem. :-)
+
+1. Connect to the Action Cable URL
+2. After the connection succeeds, send a subscribe message
+  - The subscribe message JSON should look like this
+    - {"command":"subscribe","identifier":"{\"channel\":\"MeshRelayChannel\"}"}
+  - You should receive a message like this:
+    - {"identifier"=>"{\"channel\":\"MeshRelayChannel\"}", "type"=>"confirm_subscription"}
+3. Once subscribed, you can send messages.
+  - Make sure that the command string matches the data-handling method name on your ActionCable server.
+  - Your message JSON should look like this:
+    - {"command":"message","identifier":"{\"channel\":\"MeshRelayChannel\"}","data":"{\"to\":\"user1\",\"message\":\"hello from user2\",\"action\":\"chat\"}"}
+    - Received messages should look about the same
+
+4. The important thing to note is that every message sent to the server has a `command` and `identifier` key. Also, that `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
+```ruby
+payload = {
+  command: 'command text',
+  identifier: { channel: 'MeshRelayChannel' }.to_json,
+  data: { to: 'user', message: 'hi' }.to_json
+}.to_json
+```
+
+
 ## Contributing
 
 1. Fork it ( https://github.com/NullVoxPopuli/action_cable_client/fork )
