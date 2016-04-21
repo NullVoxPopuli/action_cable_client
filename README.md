@@ -69,7 +69,10 @@ There really isn't that much to this gem. :-)
     - `{"command":"message","identifier":"{\"channel\":\"MeshRelayChannel\"}","data":"{\"to\":\"user1\",\"message\":\"hello from user2\",\"action\":\"chat\"}"}`
     - Received messages should look about the same
 
-4. The important thing to note is that every message sent to the server has a `command` and `identifier` key. Also, that `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
+4. Notes:
+  - Every message sent to the server has a `command` and `identifier` key. 
+  - The channel value must match the `name` of the channel class on the ActionCable server.
+  - `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
 ```ruby
 payload = {
   command: 'command text',
