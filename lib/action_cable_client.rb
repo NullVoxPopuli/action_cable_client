@@ -75,17 +75,9 @@ class ActionCableClient
   #   end
   def received(skip_pings = true)
     _websocket_client.stream do |message|
-      string = message.data
-      json = JSON.parse(string)
-
-      if is_ping?(json)
-        check_for_subscribe_confirmation(json) unless subscribed?
-        yield(json) unless skip_pings
-      else
+      handle_received_message(message, skip_pings) do |json|
         yield(json)
       end
-
-      deplete_queue if _queued_send
     end
   end
 
@@ -104,6 +96,53 @@ class ActionCableClient
   end
 
   private
+
+
+  # @param [WebSocket::Frame::Incoming::Client] message - the websockt message object
+  #        This object is from the websocket-ruby gem:
+  #         https://github.com/imanel/websocket-ruby/blob/master/lib/websocket/frame/incoming/client.rb
+  #
+  #   [9] pry(#<ActionCableClient>)> ap message.methods - Object.instance_methods
+  #
+  #     [ 0]                     <<(data)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
+  #     [ 1]                   code()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 2]                  code=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 3]                   data()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 4]                  data=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 5]               decoded?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
+  #     [ 6]                  error()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 7]                 error=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::ExceptionHandler)
+  #     [ 8]                 error?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [ 9]      incoming_masking?()      WebSocket::Frame::Incoming::Client
+  #     [10] initialize_with_rescue(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [11]                   next(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
+  #     [12]       next_with_rescue(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
+  #     [13]    next_without_rescue()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
+  #     [14]      outgoing_masking?()      WebSocket::Frame::Incoming::Client
+  #     [15]          support_type?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [16]       supported_frames()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [17]                   type()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #     [18]                version()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
+  #
+  # None of this really seems that importont, other than `data`
+  #
+  # @param [Boolean] skip_pings - by default, messages
+  #        with the identifier '_ping' are skipped
+  def handle_received_message(message, skip_pings = true)
+    string = message.data
+    json = JSON.parse(string)
+
+    if is_ping?(json)
+      check_for_subscribe_confirmation(json) unless subscribed?
+      yield(json) unless skip_pings
+    else
+      # TODO: do we want to yield any additional things?
+      #       maybe just make it extensible?
+      yield(json)
+    end
+
+    deplete_queue if _queued_send
+  end
 
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def check_for_subscribe_confirmation(message)

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 require 'spec_helper'
+require 'ostruct'
 
 describe ActionCableClient::Message do
   context 'with empty WebSocketClient' do
@@ -7,6 +8,37 @@ describe ActionCableClient::Message do
       allow(EventMachine::WebSocketClient).to receive(:connect) {}
       @client = ActionCableClient.new('fakeuri')
       allow(@client).to receive(:send_msg) {}
+    end
+
+    context '#handle_received_message' do
+      context 'is a ping' do
+        let(:hash){ {"identifier" => "_ping","type" => "confirm_subscription"} }
+        let(:message) { OpenStruct.new(data: hash.to_json ) }
+        it 'nothing is yielded' do
+          expect{ |b|
+            @client.send(:handle_received_message, message, true, &b)
+          }.to_not yield_with_args
+
+        end
+
+        it 'yields the ping' do
+          expect{ |b|
+            @client.send(:handle_received_message, message, false, &b)
+          }.to yield_with_args(hash)
+        end
+      end
+
+      context 'is not a ping' do
+        let(:hash) { {"identifier" => "notaping","type" => "message"} }
+        let(:message) { OpenStruct.new(data: hash.to_json ) }
+
+        it 'yields whatever' do
+          expect{ |b|
+            @client.send(:handle_received_message, message, false, &b)
+          }.to yield_with_args(hash)
+        end
+      end
+
     end
 
     context '#perform' do
