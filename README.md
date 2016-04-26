@@ -64,7 +64,7 @@ There really isn't that much to this gem. :-)
   - You should receive a message like this:
     - `{"identifier"=>"{\"channel\":\"MeshRelayChannel\"}", "type"=>"confirm_subscription"}`
 3. Once subscribed, you can send messages.
-  - Make sure that the command string matches the data-handling method name on your ActionCable server.
+  - Make sure that the `action` string matches the data-handling method name on your ActionCable server.
   - Your message JSON should look like this:
     - `{"command":"message","identifier":"{\"channel\":\"MeshRelayChannel\"}","data":"{\"to\":\"user1\",\"message\":\"hello from user2\",\"action\":\"chat\"}"}`
     - Received messages should look about the same
@@ -77,7 +77,7 @@ There really isn't that much to this gem. :-)
 payload = {
   command: 'command text',
   identifier: { channel: 'MeshRelayChannel' }.to_json,
-  data: { to: 'user', message: 'hi' }.to_json
+  data: { to: 'user', message: 'hi', action: 'chat' }.to_json
 }.to_json
 ```
 
