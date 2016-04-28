@@ -1,3 +1,7 @@
+## 1.2.3
+* The ping message received from the action cable server changed from being identity: _ping to type: ping
+* Fixed an issue where subscribing sometimes didn't work.
+
 ## 1.2.0
 * Made the handling of received messages not all happen in one method. This allows for easier overriding of what is yielded, in case someone wants to also yield the URL for example.
 
