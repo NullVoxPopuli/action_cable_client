@@ -97,7 +97,6 @@ class ActionCableClient
 
   private
 
-
   # @param [WebSocket::Frame::Incoming::Client] message - the websockt message object
   #        This object is from the websocket-ruby gem:
   #         https://github.com/imanel/websocket-ruby/blob/master/lib/websocket/frame/incoming/client.rb
@@ -133,8 +132,9 @@ class ActionCableClient
     json = JSON.parse(string)
 
     if is_ping?(json)
-      check_for_subscribe_confirmation(json) unless subscribed?
       yield(json) unless skip_pings
+    elsif !subscribed?
+      check_for_subscribe_confirmation(json)
     else
       # TODO: do we want to yield any additional things?
       #       maybe just make it extensible?
@@ -153,7 +153,7 @@ class ActionCableClient
   # {"identifier" => "_ping","message" => 1460201942}
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def is_ping?(message)
-    message_identifier = message[Message::IDENTIFIER_KEY]
+    message_identifier = message[Message::TYPE_KEY]
     Message::IDENTIFIER_PING == message_identifier
   end
 

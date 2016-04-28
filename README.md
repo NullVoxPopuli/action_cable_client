@@ -70,7 +70,9 @@ There really isn't that much to this gem. :-)
     - Received messages should look about the same
 
 4. Notes:
-  - Every message sent to the server has a `command` and `identifier` key. 
+  - Every message sent to the server has a `command` and `identifier` key.
+  - Ping messages from the action cable server look like:
+    - `{ "type" => "ping", "message" =>  1461845503 }`
   - The channel value must match the `name` of the channel class on the ActionCable server.
   - `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
 ```ruby

@@ -1,5 +1,13 @@
 # frozen_string_literal: true
-require 'action_cable_client'
+# require 'action_cable_client'
+
+current_dir = File.dirname(__FILE__)
+# set load path (similar to how gems require files (relative to lib))
+
+lib = current_dir + '/lib/'
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+
+require current_dir + '/lib/action_cable_client'
 
 class KeyboardHandler < EM::Connection
   include EM::Protocols::LineText2
@@ -15,9 +23,10 @@ end
 
 # this is just a runnable example from the readme
 EventMachine.run do
-  client = ActionCableClient.new('ws://localhost:3001?uid=user1', 'MeshRelayChannel')
+  client = ActionCableClient.new('ws://mesh-relay-in-us-1.herokuapp.com', 'MeshRelayChannel')
   client.connected { puts 'successfully connected.' }
   client.received do |message|
+    puts client.subscribed?
     puts message
   end
 
