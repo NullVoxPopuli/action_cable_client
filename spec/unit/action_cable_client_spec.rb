@@ -12,7 +12,7 @@ describe ActionCableClient::Message do
 
     context '#handle_received_message' do
       context 'is a ping' do
-        let(:hash){ {"identifier" => "_ping","type" => "confirm_subscription"} }
+        let(:hash){ {"identifier" => "ping","type" => "confirm_subscription"} }
         let(:message) { OpenStruct.new(data: hash.to_json ) }
         it 'nothing is yielded' do
           expect{ |b|
@@ -120,13 +120,13 @@ describe ActionCableClient::Message do
 
     context '#is_ping?' do
       it 'is a ping' do
-        msg = { 'identifier' => '_ping', 'message' => 1_460_201_942 }
+        msg = { 'identifier' => 'ping', 'message' => 1_460_201_942 }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq true
       end
 
       it 'is a ping when it is a confirmation' do
-        msg = { 'identifier' => '_ping', 'type' => 'confirm_subscription' }
+        msg = { 'identifier' => 'ping', 'type' => 'confirm_subscription' }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq true
       end
