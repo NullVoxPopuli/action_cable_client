@@ -33,6 +33,7 @@ describe ActionCableClient::Message do
 
         it 'yields whatever' do
           expect do |b|
+            @client.subscribed = true
             @client.send(:handle_received_message, message, false, &b)
           end.to yield_with_args(hash)
         end
