@@ -23,7 +23,7 @@ Gem::Specification.new do |s|
 
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
-  s.required_ruby_version = '>= 2.3.0'
+  s.required_ruby_version     = '>= 2.2.2'
 
   s.add_runtime_dependency 'activesupport'
   s.add_runtime_dependency 'em-websocket-client'
