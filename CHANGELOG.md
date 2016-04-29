@@ -1,3 +1,6 @@
+## 1.2.4
+* [#3](https://github.com/NullVoxPopuli/action_cable_client/pull/3) Support Ruby 2.2.2 (@NullVoxPopuli)
+
 ## 1.2.3
 * The ping message received from the action cable server changed from being identity: _ping to type: ping
 * Fixed an issue where subscribing sometimes didn't work.
