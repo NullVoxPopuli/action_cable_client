@@ -1,4 +1,4 @@
-## 1.2.6
+## 1.3.0
 * subscribed now is a callback instead of a boolean
 * subscribed? tells whether or not the client is subscribed to the channel
 * added subscribed callback which signifies when the client can start sending messages on the channel
