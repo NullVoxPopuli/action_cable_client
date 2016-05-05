@@ -42,6 +42,7 @@ This example is compatible with [this version of a small Rails app with Action C
 The available hooks to tie in to are:
  - `disconnected {}`
  - `connected {}`
+ - `subscribed {}`
  - `errored { |msg| }`
  - `received { |msg }`
 

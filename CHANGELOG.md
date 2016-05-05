@@ -1,3 +1,8 @@
+## 1.2.6
+* subscribed now is a callback instead of a boolean
+* subscribed? tells whether or not the client is subscribed to the channel
+* added subscribed callback which signifies when the client can start sending messages on the channel
+
 ## 1.2.4
 * [#3](https://github.com/NullVoxPopuli/action_cable_client/pull/3) Support Ruby 2.2.2 (@NullVoxPopuli)
 

@@ -21,9 +21,7 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue, :subscribed
-
-  alias subscribed? subscribed
+  attr_accessor :message_queue, :_subscribed, :_subscribed_callaback
 
   def_delegator :_websocket_client, :disconnect, :disconnected
   def_delegator :_websocket_client, :errback, :errored
@@ -39,7 +37,7 @@ class ActionCableClient
     @_uri = uri
     @_queued_send = queued_send
     @message_queue = []
-    @subscribed = false
+    @_subscribed = false
 
     @_message_factory = MessageFactory.new(channel)
     # NOTE:
@@ -94,6 +92,28 @@ class ActionCableClient
     end
   end
 
+  # callback when the client receives a confirm_subscription message
+  # from the action_cable server.
+  # This is only called once, and signifies that you can now send
+  # messages on the channel
+  #
+  # @param [Proc] block - code to run after subscribing to the channel is confirmed
+  #
+  # @example
+  #   client = ActionCableClient.new(uri, 'RoomChannel')
+  #   client.connected {}
+  #   client.subscribed do
+  #     # do things after successful subscription confirmation
+  #   end
+  def subscribed(&block)
+    self._subscribed_callaback = block
+  end
+
+  # @return [Boolean] is the client subscribed to the channel?
+  def subscribed?
+    _subscribed
+  end
+
   private
 
   # @param [WebSocket::Frame::Incoming::Client] message - the websockt message object
@@ -146,7 +166,10 @@ class ActionCableClient
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def check_for_subscribe_confirmation(message)
     message_type = message[Message::TYPE_KEY]
-    self.subscribed = true if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
+    if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
+      self._subscribed = true
+      _subscribed_callaback.call if _subscribed_callaback
+    end
   end
 
   # {"identifier" => "_ping","message" => 1460201942}
@@ -177,7 +200,7 @@ class ActionCableClient
     if subscribed?
       msg = _message_factory.create(Commands::MESSAGE, action, data)
       json = msg.to_json
-      send_msg(to_json)
+      send_msg(json)
     end
   end
 end

@@ -33,7 +33,7 @@ describe ActionCableClient::Message do
 
         it 'yields whatever' do
           expect do |b|
-            @client.subscribed = true
+            @client._subscribed = true
             @client.send(:handle_received_message, message, false, &b)
           end.to yield_with_args(hash)
         end
@@ -65,13 +65,13 @@ describe ActionCableClient::Message do
 
     context '#dispatch_message' do
       it 'does not send if not subscribed' do
-        @client.subscribed = false
+        @client._subscribed = false
         expect(@client).to_not receive(:send_msg)
         @client.send(:dispatch_message, 'action', {})
       end
 
       it 'calls sends when subscribed' do
-        @client.subscribed = true
+        @client._subscribed = true
         expect(@client).to receive(:send_msg) {}
         @client.send(:dispatch_message, 'action', {})
       end
@@ -81,6 +81,26 @@ describe ActionCableClient::Message do
       it 'sends a message' do
         expect(@client).to receive(:send_msg) {}
         @client.send(:subscribe)
+      end
+    end
+
+    context '#subscribed' do
+      it 'sets the callback' do
+        expect(@client._subscribed_callaback).to eq nil
+        @client.subscribed {}
+        expect(@client._subscribed_callaback).to_not eq nil
+      end
+
+      it 'once the callback is set, receiving a subscription confirmation invokes the callback' do
+        callback_called = false
+        @client.subscribed do
+          callback_called = true
+        end
+
+        expect(@client).to receive(:_subscribed_callaback).twice.and_call_original
+        message = { 'identifier' => 'ping', 'type' => 'confirm_subscription' }
+        @client.send(:check_for_subscribe_confirmation, message)
+        expect(callback_called).to eq true
       end
     end
 
@@ -98,7 +118,7 @@ describe ActionCableClient::Message do
       context 'queuing is enabled' do
         before(:each) do
           allow(@client).to receive(:_queued_send) { true }
-          @client.subscribed = true
+          @client._subscribed = true
         end
         it 'clears the queue' do
           @client.perform('action', {})
