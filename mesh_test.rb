@@ -30,5 +30,14 @@ EventMachine.run do
     puts message
   end
 
+  client.errored do |*args|
+    puts 'error'
+    puts args
+  end
+
+  client.disconnected do
+    puts 'disconnected'
+  end
+
   EM.open_keyboard(KeyboardHandler, client)
 end

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    action_cable_client (1.2.3)
+    action_cable_client (1.2.5)
       activesupport
       em-websocket-client
 

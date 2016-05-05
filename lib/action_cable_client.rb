@@ -27,7 +27,6 @@ class ActionCableClient
 
   def_delegator :_websocket_client, :disconnect, :disconnected
   def_delegator :_websocket_client, :errback, :errored
-  def_delegator :_websocket_client, :connection_completed, :connected?
   def_delegator :_websocket_client, :send_msg, :send_msg
 
   # @param [String] uri - e.g.: ws://domain:port
@@ -177,7 +176,8 @@ class ActionCableClient
     # can't send messages if we aren't subscribed
     if subscribed?
       msg = _message_factory.create(Commands::MESSAGE, action, data)
-      send_msg(msg.to_json)
+      json = msg.to_json
+      send_msg(to_json)
     end
   end
 end
