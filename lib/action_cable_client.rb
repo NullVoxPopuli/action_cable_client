@@ -23,7 +23,6 @@ class ActionCableClient
   # [ action, data ]
   attr_accessor :message_queue, :_subscribed, :_subscribed_callaback
 
-  def_delegator :_websocket_client, :disconnect, :disconnected
   def_delegator :_websocket_client, :errback, :errored
   def_delegator :_websocket_client, :send_msg, :send_msg
 
@@ -112,6 +111,21 @@ class ActionCableClient
   # @return [Boolean] is the client subscribed to the channel?
   def subscribed?
     _subscribed
+  end
+
+  # callback when the server disconnects from the client.
+  #
+  # @example
+  #   client = ActionCableClient.new(uri, 'RoomChannel')
+  #   client.connected {}
+  #   client.disconnected do
+  #     # cleanup after the server disconnects from the client
+  #   end
+  def disconnected
+    _websocket_client.disconnect do
+      self._subscribed = false
+      yield
+    end
   end
 
   private

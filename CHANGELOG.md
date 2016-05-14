@@ -1,3 +1,6 @@
+## 1.3.2
+* Getting disconnected from the server will now set the result of subscribed? to false
+
 ## 1.3.0
 * subscribed now is a callback instead of a boolean
 * subscribed? tells whether or not the client is subscribed to the channel

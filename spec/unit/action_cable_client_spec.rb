@@ -114,6 +114,11 @@ describe ActionCableClient::Message do
       end
     end
 
+    context '#disconnected' do
+      it 'sets subscribed to false' do
+      end
+    end
+
     context '#deplete_queue' do
       context 'queuing is enabled' do
         before(:each) do
