@@ -162,6 +162,7 @@ class ActionCableClient
   #        with the identifier '_ping' are skipped
   def handle_received_message(message, skip_pings = true)
     string = message.data
+    return if string.empty?
     json = JSON.parse(string)
 
     if is_ping?(json)
