@@ -38,6 +38,17 @@ describe ActionCableClient::Message do
           end.to yield_with_args(hash)
         end
       end
+
+      context 'empty messages are ignored' do
+        let(:message) { OpenStruct.new(data: '') }
+
+        it 'dont yield' do
+          expect do |b|
+            @client._subscribed = true
+            @client.send(:handle_received_message, message, false, &b)
+          end.not_to yield_with_args
+        end
+      end
     end
 
     context '#perform' do
