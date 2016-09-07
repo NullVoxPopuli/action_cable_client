@@ -1,3 +1,6 @@
+## 1.3.4
+* [#7](https://github.com/NullVoxPopuli/action_cable_client/pull/7) Avoid crashing on empty JSON data (@MikeAski)
+
 ## 1.3.2
 * Getting disconnected from the server will now set the result of subscribed? to false
 
