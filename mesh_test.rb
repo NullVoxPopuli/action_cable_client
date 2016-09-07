@@ -17,13 +17,14 @@ class KeyboardHandler < EM::Connection
   end
 
   def receive_line(data)
-    @client.perform('chat', message: data, to: 'user2')
+    @client.perform('chat', message: data, to: '124')
   end
 end
 
 # this is just a runnable example from the readme
 EventMachine.run do
-  client = ActionCableClient.new('ws://mesh-relay-in-us-1.herokuapp.com', 'MeshRelayChannel')
+  # client = ActionCableClient.new('ws://mesh-relay-in-us-1.herokuapp.com', 'MeshRelayChannel')
+  client = ActionCableClient.new('ws://localhost:3000?uid=124', 'MeshRelayChannel')
   client.connected { puts 'successfully connected.' }
   client.received do |message|
     puts client.subscribed?
