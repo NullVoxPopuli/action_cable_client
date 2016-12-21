@@ -6,6 +6,7 @@ class ActionCableClient
     # @param [String] channel - the name of the subscribed channel
     def initialize(channel)
       @_channel = channel
+      @identifier = {channel: _channel)
     end
 
     # @param [String] command - the type of message that this is
@@ -26,8 +27,8 @@ class ActionCableClient
     # the ending result should look like
     # "{"channel":"RoomChannel"}" but that's up to
     # the Mesage to format it
-    def identifier
-      { channel: _channel }
-    end
+#     def identifier
+#       { channel: _channel }
+#     end
   end
 end
