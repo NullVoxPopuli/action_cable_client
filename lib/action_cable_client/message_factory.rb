@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 class ActionCableClient
   class MessageFactory
-    attr_reader :_channel
+    attr_reader :_channel, :identifier
 
     # @param [String] channel - the name of the subscribed channel
     def initialize(channel)
       @_channel = channel
-      @identifier = {channel: _channel)
+      @identifier = {channel: _channel}
     end
 
     # @param [String] command - the type of message that this is
