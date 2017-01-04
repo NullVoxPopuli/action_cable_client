@@ -6,8 +6,8 @@ require 'pry-byebug' # binding.pry to debug!
 
 # Coverage
 ENV['CODECLIMATE_REPO_TOKEN'] = 'a36151a91a3f70083cbdb99e00dbf75ca91cafb910ad38d0e413c84063872f32'
-require 'codeclimate-test-reporter'
-CodeClimate::TestReporter.start
+require 'simplecov'
+SimpleCov.start
 
 # This Gem
 require 'action_cable_client'
