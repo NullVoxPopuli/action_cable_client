@@ -35,6 +35,22 @@ EventMachine.run do
 end
 ```
 
+To pass additional parameters while subscribing, add them to the identifier hash. These will be available server side in the channel's params hash.
+```ruby
+EventMachine.run do
+
+  uri = "ws://localhost:3000/cable/"
+  client = ActionCableClient.new(uri, 'RoomChannel')
+  client._message_factory.identifier[:my_new_param] = 'my new value'
+...
+
+class RoomsChannel < ApplicationCable::Channel
+  def subscribed
+    puta params[:my_new_param]} # 'my new value'
+  end
+end
+```
+
 This example is compatible with [this version of a small Rails app with Action Cable](https://github.com/NullVoxPopuli/mesh-relay/tree/2ed88928d91d82b88b7878fcb97e3bd81977cfe8)
 
 
