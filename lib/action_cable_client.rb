@@ -32,7 +32,6 @@ class ActionCableClient
   # @param [Boolean] queued_send - optionally send messages after a ping
   #                                is received, rather than instantly
   def initialize(uri, channel = '', queued_send = false)
-    @_channel_name = channel
     @_uri = uri
     @_queued_send = queued_send
     @message_queue = []
