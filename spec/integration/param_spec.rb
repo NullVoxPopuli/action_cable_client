@@ -7,7 +7,7 @@ describe 'Sending parameters to the server' do
   it 'sends during connection' do
     # The plan here is to exit EventMachine once we receive what we need to.
     # We may also want to set some sort of timeout to auto-exit event machine
-    EventMatchine.run do
+    EventMachine.run do
       # TODO: how do we know the host of the test server?
       uri = '/cable/?user_name=test_uri_param_on_connect'
       client = ActionCableClient.new(uri, 'UriParamTestChannel')
