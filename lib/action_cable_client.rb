@@ -32,19 +32,22 @@ class ActionCableClient
   # @param [Boolean] queued_send - optionally send messages after a ping
   #                                is received, rather than instantly
   def initialize(uri, channel = '', queued_send = false)
-    @_channel_name = channel
     @_uri = uri
     @_queued_send = queued_send
     @message_queue = []
     @_subscribed = false
 
     @_message_factory = MessageFactory.new(channel)
+
+    origin = URI.parse(_uri)
+    origin.scheme = origin.scheme == "ws" ? "http" : "https"
+
     # NOTE:
     #   EventMachine::WebSocketClient
     #      https://github.com/mwylde/em-websocket-client/blob/master/lib/em-websocket-client.rb
     #   is a subclass of
     #      https://github.com/eventmachine/eventmachine/blob/master/lib/em/connection.rb
-    @_websocket_client = EventMachine::WebSocketClient.connect(_uri)
+    @_websocket_client = EventMachine::WebSocketClient.connect(_uri, origin: origin.to_s)
   end
 
   # @param [String] action - how the message is being sent
