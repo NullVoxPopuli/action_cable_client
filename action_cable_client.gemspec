@@ -32,4 +32,5 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'pry-byebug'
   s.add_development_dependency 'codeclimate-test-reporter'
   s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'awesome_print'
 end

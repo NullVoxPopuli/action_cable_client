@@ -38,7 +38,7 @@ class ActionCableClient
     @_queued_send = queued_send
     @message_queue = []
     @_subscribed = false
-
+    ap uri
     @_message_factory = MessageFactory.new(channel)
     # NOTE:
     #   EventMachine::WebSocketClient

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require_relative 'boot'
-# require 'rails/all'
 
 require 'rails'
 # Only testing action cable
