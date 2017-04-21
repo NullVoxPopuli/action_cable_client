@@ -50,6 +50,29 @@ The available hooks to tie in to are:
  - `errored { |msg| }`
  - `received { |msg }`
 
+
+Connecting on initialization is also configurable.
+
+```ruby
+client = ActionCableClient.new(uri, channel, false, connect_on_start: false)
+client.connect!
+```
+
+this way if you also enable ping receiving via
+```ruby
+client.received(false) do |json|
+  # now pings will be here as well, because skip_pings is set to false
+end
+```
+
+you could track the time since you last received a ping, if you haven't received one in a while, it could be that your client is disconnected.
+
+To reconnect,
+
+```ruby
+client.connect!
+```
+
 ## Demo
 
 [![Live Demo](http://img.youtube.com/vi/x9D1wWsVHMY/mqdefault.jpg)](http://www.youtube.com/watch?v=x9D1wWsVHMY&hd=1)
