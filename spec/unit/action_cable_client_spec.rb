@@ -6,7 +6,7 @@ require 'ostruct'
 describe ActionCableClient::Message do
   context 'with empty WebSocketClient' do
     before(:each) do
-      allow(EventMachine::WebSocketClient).to receive(:connect) {}
+      allow(WebSocket::EventMachine::Client).to receive(:connect) {}
       @client = ActionCableClient.new('fakeuri')
       allow(@client).to receive(:send_msg) {}
     end
@@ -14,7 +14,7 @@ describe ActionCableClient::Message do
     context '#handle_received_message' do
       context 'is a ping' do
         let(:hash) { { 'type' => 'ping', 'message' => 1_461_845_503 } }
-        let(:message) { OpenStruct.new(data: hash.to_json) }
+        let(:message) { hash.to_json }
         it 'nothing is yielded' do
           expect do |b|
             @client.send(:handle_received_message, message, true, &b)
@@ -30,7 +30,7 @@ describe ActionCableClient::Message do
 
       context 'is not a ping' do
         let(:hash) { { 'identifier' => 'notaping', 'type' => 'message' } }
-        let(:message) { OpenStruct.new(data: hash.to_json) }
+        let(:message) { hash.to_json }
 
         it 'yields whatever' do
           expect do |b|
@@ -41,7 +41,7 @@ describe ActionCableClient::Message do
       end
 
       context 'empty messages are ignored' do
-        let(:message) { OpenStruct.new(data: '') }
+        let(:message) { '' }
 
         it 'dont yield' do
           expect do |b|
