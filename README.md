@@ -1,7 +1,3 @@
-# LOOKING FOR MAINTAINERS
-
-If you're interested in helping out the project, feel free to submit some PRs / help out with issues. :-)
-
 # Action Cable Client
 [![Gem Version](https://badge.fury.io/rb/action_cable_client.svg)](https://badge.fury.io/rb/action_cable_client)
 [![Build Status](https://travis-ci.org/NullVoxPopuli/action_cable_client.svg?branch=master)](https://travis-ci.org/NullVoxPopuli/action_cable_client)
