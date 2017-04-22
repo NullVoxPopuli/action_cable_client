@@ -1,7 +1,6 @@
 language: ruby
 bundler_args: --without guard
 rvm:
-  - "2.2.2"
   - "2.3.1"
   - "2.4.0"
   - ruby-head
