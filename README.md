@@ -81,6 +81,16 @@ then on the server end, in your Channel, `params` will give you:
 }
 ```
 
+#### Using Headers
+
+
+```ruby
+params = { channel: 'RoomChannel', favorite_color: 'blue' }
+client = ActionCableClient.new(uri, params, true, {
+  'Authorization' => 'Bearer token'
+})
+```
+
 
 ## Demo
 
