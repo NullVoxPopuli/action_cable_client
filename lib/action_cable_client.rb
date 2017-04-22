@@ -188,7 +188,7 @@ class ActionCableClient
     message_type = message[Message::TYPE_KEY]
     if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
       self._subscribed = true
-      _subscribed_callaback.call if _subscribed_callaback
+      _subscribed_callaback&.call
     end
   end
 

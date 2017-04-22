@@ -108,7 +108,7 @@ describe ActionCableClient::Message do
           callback_called = true
         end
 
-        expect(@client).to receive(:_subscribed_callaback).twice.and_call_original
+        expect(@client).to receive(:_subscribed_callaback).and_call_original
         message = { 'identifier' => 'ping', 'type' => 'confirm_subscription' }
         @client.send(:check_for_subscribe_confirmation, message)
         expect(callback_called).to eq true

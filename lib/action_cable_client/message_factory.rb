@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 class ActionCableClient
   class MessageFactory
-    attr_reader :_channel
+    attr_reader :_channel, :identifier
 
     # @param [String] channel - the name of the subscribed channel
     def initialize(channel)
       @_channel = channel
+      @identifier = { channel: _channel }
     end
 
     # @param [String] command - the type of message that this is
@@ -21,13 +22,6 @@ class ActionCableClient
     # @return [Hash] The data that will be included in the message
     def build_data(action, message)
       message.merge(action: action) if message.is_a?(Hash)
-    end
-
-    # the ending result should look like
-    # "{"channel":"RoomChannel"}" but that's up to
-    # the Mesage to format it
-    def identifier
-      { channel: _channel }
     end
   end
 end
