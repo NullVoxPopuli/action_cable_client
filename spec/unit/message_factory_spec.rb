@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ActionCableClient::MessageFactory do
@@ -9,9 +10,9 @@ describe ActionCableClient::MessageFactory do
   end
 
   it 'requires a proper channel name' do
-    expect {
+    expect do
       ActionCableClient::MessageFactory.new(nil)
-    }.to raise_error(ActionCableClient::Errors::ChannelNotSpecified)
+    end.to raise_error(ActionCableClient::Errors::ChannelNotSpecified)
   end
 
   context '#build_data' do

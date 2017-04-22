@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # required gems
 require 'em-websocket-client'
 require 'forwardable'
@@ -180,10 +181,10 @@ class ActionCableClient
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def check_for_subscribe_confirmation(message)
     message_type = message[Message::TYPE_KEY]
-    if Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
-      self._subscribed = true
-      _subscribed_callaback.call if _subscribed_callaback
-    end
+    return unless  Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
+
+    self._subscribed = true
+    _subscribed_callaback&.call
   end
 
   # {"identifier" => "_ping","message" => 1460201942}
@@ -200,10 +201,10 @@ class ActionCableClient
 
   def dispatch_message(action, data)
     # can't send messages if we aren't subscribed
-    if subscribed?
-      msg = _message_factory.create(Commands::MESSAGE, action, data)
-      json = msg.to_json
-      send_msg(json)
-    end
+    return unless subscribed?
+
+    msg = _message_factory.create(Commands::MESSAGE, action, data)
+    json = msg.to_json
+    send_msg(json)
   end
 end

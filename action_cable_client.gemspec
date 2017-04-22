@@ -18,12 +18,12 @@ Gem::Specification.new do |s|
   s.summary     = "ActionCableClient-#{ActionCableClient::VERSION}"
   s.description = "A ruby client for interacting with Rails' ActionCable"
 
-  s.files        = Dir['CHANGELOG.md', 'LICENSE' 'MIT-LICENSE', 'README.md', 'lib/**/*']
+  s.files        = Dir['CHANGELOG.md', 'LICENSE', 'MIT-LICENSE', 'README.md', 'lib/**/*']
   s.require_path = 'lib'
 
   s.test_files = s.files.grep(%r{^(test|spec|features)/})
 
-  s.required_ruby_version     = '>= 2.2.2'
+  s.required_ruby_version = '>= 2.2.2'
 
   s.add_runtime_dependency 'activesupport',        '>= 5.0.0.beta4'
   s.add_runtime_dependency 'em-websocket-client',  '>= 0.1.2'

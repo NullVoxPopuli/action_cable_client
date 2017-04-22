@@ -1,16 +1,21 @@
 AllCops:
+  TargetRubyVersion: 2.4
   Exclude:
     - config/initializers/forbidden_yaml.rb
-    - action_cable_client.gemspec
     - !ruby/regexp /(vendor|bundle|bin|db|tmp)\/.*/
   DisplayCopNames: true
   DisplayStyleGuide: true
-  TargetRubyVersion: 2.3
+
+Lint/AssignmentInCondition:
+  Enabled: false
 
 Lint/NestedMethodDefinition:
   Enabled: false
   Exclude:
     - test/action_controller/serialization_test.rb
+
+Style/FrozenStringLiteralComment:
+  EnforcedStyle: always
 
 Style/StringLiterals:
   EnforcedStyle: single_quotes
@@ -18,10 +23,12 @@ Style/StringLiterals:
 Metrics/AbcSize:
   Max: 35 # TODO: Lower to 15
 
+Metrics/BlockLength:
+  Exclude:
+    - spec/**/*
+
 Metrics/ClassLength:
   Max: 261 # TODO: Lower to 100
-  Exclude:
-    - test/**/*.rb
 
 Metrics/CyclomaticComplexity:
   Max: 7 # TODO: Lower to 6
@@ -42,6 +49,9 @@ Style/ClassAndModuleChildren:
   EnforcedStyle: nested
 
 Style/Documentation:
+  Enabled: false
+
+Style/DoubleNegation:
   Enabled: false
 
 Style/MissingElse:

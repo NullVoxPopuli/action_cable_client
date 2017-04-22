@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 # require 'action_cable_client'
 
 current_dir = File.dirname(__FILE__)

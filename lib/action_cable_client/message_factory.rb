@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class ActionCableClient
   class MessageFactory
     attr_reader :channel, :identifier
