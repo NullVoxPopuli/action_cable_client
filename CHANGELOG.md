@@ -2,11 +2,13 @@
 
 **General**
 
-* [18](https://github.com/NullVoxPopuli/action_cable_client/pull/18) Added the ability to reconnect (@NullVoxPopuli)
-* [19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Allow for additional params via the identifier (@mcary, @NullVoxPopuli)
+* [#18](https://github.com/NullVoxPopuli/action_cable_client/pull/18) Added the ability to reconnect (@NullVoxPopuli)
+* [#19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Allow for additional params via the identifier (@mcary, @NullVoxPopuli)
+* Support ruby-2.4.x
 
 **Breaking**
-* [19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Removed queued_send in initializer - this allows for a action_cable_client to be simpler, and stay an true to real-time communication as possible -- also it wasn't being used.  (@NullVoxPopuli)
+* [#19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Removed queued_send in initializer - this allows for a action_cable_client to be simpler, and stay an true to real-time communication as possible -- also it wasn't being used.  (@NullVoxPopuli)
+* Drop Support for ruby-2.2.x
 
 ## 1.3.4
 * [#7](https://github.com/NullVoxPopuli/action_cable_client/pull/7) Avoid crashing on empty JSON data (@MikeAski)
