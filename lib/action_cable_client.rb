@@ -19,7 +19,6 @@ class ActionCableClient
 
   attr_reader :_websocket_client, :_uri, :_channel_name, :_queued_send
   attr_reader :_message_factory
-  # The queue should store entries in the format:
   # [ action, data ]
   attr_accessor :message_queue, :_subscribed, :_subscribed_callaback
 
@@ -29,6 +28,8 @@ class ActionCableClient
   # @param [String] uri - e.g.: ws://domain:port
   # @param [String] channel - the name of the channel on the Rails server
   #                           e.g.: RoomChannel
+  # TODO: @param [Hash] params - optionally provide additional params to pass
+  #                              upon connection and subscription??
   # @param [Boolean] queued_send - optionally send messages after a ping
   #                                is received, rather than instantly
   def initialize(uri, channel = '', queued_send = false, connect_on_start: true)
@@ -37,7 +38,7 @@ class ActionCableClient
     @_queued_send = queued_send
     @message_queue = []
     @_subscribed = false
-
+    ap uri
     @_message_factory = MessageFactory.new(channel)
 
     connect! if connect_on_start
