@@ -33,7 +33,7 @@ class ActionCableClient
   #                           e.g.: RoomChannel
   # @param [Boolean] connect_on_start - connects on init when true
   #                                   - otherwise manually call `connect!`
-  def initialize(uri, params, connect_on_start = true)
+  def initialize(uri, params = '', connect_on_start = true)
     @_uri = uri
     @message_queue = []
     @_subscribed = false
