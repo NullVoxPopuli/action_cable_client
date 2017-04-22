@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # required gems
-require 'em-websocket-client'
+require 'websocket-eventmachine-client'
 require 'forwardable'
 require 'active_support/core_ext/string'
 require 'json'
@@ -25,8 +25,8 @@ class ActionCableClient
   # [ action, data ]
   attr_accessor :message_queue, :_subscribed, :_subscribed_callaback
 
-  def_delegator :_websocket_client, :errback, :errored
-  def_delegator :_websocket_client, :send_msg, :send_msg
+  def_delegator :_websocket_client, :onerror, :errored
+  def_delegator :_websocket_client, :send, :send_msg
 
   # @param [String] uri - e.g.: ws://domain:port
   # @param [String] params - the name of the channel on the Rails server
@@ -34,23 +34,31 @@ class ActionCableClient
   #                           e.g.: RoomChannel
   # @param [Boolean] connect_on_start - connects on init when true
   #                                   - otherwise manually call `connect!`
-  def initialize(uri, params = '', connect_on_start = true)
+  # @param [Hash] headers - HTTP headers to use in the handshake
+  def initialize(uri, params = '', connect_on_start = true, headers = {})
     @_uri = uri
     @message_queue = []
     @_subscribed = false
 
     @_message_factory = MessageFactory.new(params)
 
-    connect! if connect_on_start
+    connect!(headers) if connect_on_start
   end
 
-  def connect!
-    # NOTE:
-    #   EventMachine::WebSocketClient
-    #      https://github.com/mwylde/em-websocket-client/blob/master/lib/em-websocket-client.rb
-    #   is a subclass of
-    #      https://github.com/eventmachine/eventmachine/blob/master/lib/em/connection.rb
-    @_websocket_client = EventMachine::WebSocketClient.connect(@_uri)
+  def connect!(headers = {})
+    # Quick Reference for WebSocket::EM::Client's api
+    # - onopen - called after successfully connecting
+    # - onclose - called after closing connection
+    # - onmessage - called when client recives a message. on `message do |msg, type (text or binary)|``
+    #             - also called when a ping is received
+    # - onerror - called when client encounters an error
+    # - onping - called when client receives a ping from the server
+    # - onpong - called when client receives a pong from the server
+    # - send - sends a message to the server (and also disables any metaprogramming shenanigans :-/)
+    # - close - closes the connection and optionally sends close frame to server. `close(code, data)`
+    # - ping - sends a ping
+    # - pong - sends a pong
+    @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers)
   end
 
   # @param [String] action - how the message is being sent
@@ -72,7 +80,7 @@ class ActionCableClient
   #     puts message
   #   end
   def received(skip_pings = true)
-    _websocket_client.stream do |message|
+    _websocket_client.onmessage do |message, _type|
       handle_received_message(message, skip_pings) do |json|
         yield(json)
       end
@@ -87,7 +95,7 @@ class ActionCableClient
   #     # do things after the client is connected to the server
   #   end
   def connected
-    _websocket_client.callback do
+    _websocket_client.onopen do
       subscribe
       yield
     end
@@ -124,7 +132,7 @@ class ActionCableClient
   #     # cleanup after the server disconnects from the client
   #   end
   def disconnected
-    _websocket_client.disconnect do
+    _websocket_client.onclose do
       self._subscribed = false
       yield
     end
@@ -132,40 +140,12 @@ class ActionCableClient
 
   private
 
-  # @param [WebSocket::Frame::Incoming::Client] message - the websockt message object
-  #        This object is from the websocket-ruby gem:
-  #         https://github.com/imanel/websocket-ruby/blob/master/lib/websocket/frame/incoming/client.rb
-  #
-  #   [9] pry(#<ActionCableClient>)> ap message.methods - Object.instance_methods
-  #
-  #     [ 0]                     <<(data)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
-  #     [ 1]                   code()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 2]                  code=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 3]                   data()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 4]                  data=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 5]               decoded?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
-  #     [ 6]                  error()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 7]                 error=(arg1)  WebSocket::Frame::Incoming::Client (WebSocket::ExceptionHandler)
-  #     [ 8]                 error?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [ 9]      incoming_masking?()      WebSocket::Frame::Incoming::Client
-  #     [10] initialize_with_rescue(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [11]                   next(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
-  #     [12]       next_with_rescue(*args) WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
-  #     [13]    next_without_rescue()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Incoming)
-  #     [14]      outgoing_masking?()      WebSocket::Frame::Incoming::Client
-  #     [15]          support_type?()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [16]       supported_frames()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [17]                   type()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #     [18]                version()      WebSocket::Frame::Incoming::Client (WebSocket::Frame::Base)
-  #
-  # None of this really seems that importont, other than `data`
-  #
+  # @param [String] message - the websockt message object
   # @param [Boolean] skip_pings - by default, messages
   #        with the identifier '_ping' are skipped
   def handle_received_message(message, skip_pings = true)
-    string = message.data
-    return if string.empty?
-    json = JSON.parse(string)
+    return if message.empty?
+    json = JSON.parse(message)
 
     if is_ping?(json)
       yield(json) unless skip_pings

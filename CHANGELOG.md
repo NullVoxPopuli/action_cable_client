@@ -1,10 +1,13 @@
-## 1.4 - Unreleased
+## 2.0 - Unreleased
 
 **General**
 
 * [#18](https://github.com/NullVoxPopuli/action_cable_client/pull/18) Added the ability to reconnect (@NullVoxPopuli)
 * [#19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Allow for additional params via the identifier (@mcary, @NullVoxPopuli)
 * Support ruby-2.4.x
+* [#20](https://github.com/NullVoxPopuli/action_cable_client/pull/20) Change underlying websocket gem to [websocket-eventmachine-client](https://github.com/imanel/websocket-eventmachine-client)
+  * enables SSL
+  * allows header usage on handshake
 
 **Breaking**
 * [#19](https://github.com/NullVoxPopuli/action_cable_client/pull/19) Removed queued_send in initializer - this allows for a action_cable_client to be simpler, and stay an true to real-time communication as possible -- also it wasn't being used.  (@NullVoxPopuli)
