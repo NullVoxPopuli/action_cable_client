@@ -47,8 +47,8 @@ The available hooks to tie in to are:
 #### Connecting on initialization is also configurable.
 
 ```ruby
-client = ActionCableClient.new(uri, 'RoomChannel', connect_on_start: false)
-client.connect!
+client = ActionCableClient.new(uri, 'RoomChannel', false)
+client.connect!(headers = {})
 ```
 
 this way if you also enable ping receiving via
