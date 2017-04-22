@@ -6,6 +6,7 @@ require 'active_support/core_ext/string'
 require 'json'
 
 # local files
+require 'action_cable_client/errors'
 require 'action_cable_client/message_factory'
 require 'action_cable_client/message'
 
@@ -17,7 +18,7 @@ class ActionCableClient
     MESSAGE = 'message'
   end
 
-  attr_reader :_websocket_client, :_uri, :_channel_name, :_queued_send
+  attr_reader :_websocket_client, :_uri
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
@@ -27,18 +28,17 @@ class ActionCableClient
   def_delegator :_websocket_client, :send_msg, :send_msg
 
   # @param [String] uri - e.g.: ws://domain:port
-  # @param [String] channel - the name of the channel on the Rails server
+  # @param [String] params - the name of the channel on the Rails server
+  #                          or params. This gets sent with every request.
   #                           e.g.: RoomChannel
-  # @param [Boolean] queued_send - optionally send messages after a ping
-  #                                is received, rather than instantly
-  def initialize(uri, channel = '', queued_send = false, connect_on_start: true)
-    @_channel_name = channel
+  # @param [Boolean] connect_on_start - connects on init when true
+  #                                   - otherwise manually call `connect!`
+  def initialize(uri, params, connect_on_start = true)
     @_uri = uri
-    @_queued_send = queued_send
     @message_queue = []
     @_subscribed = false
 
-    @_message_factory = MessageFactory.new(channel)
+    @_message_factory = MessageFactory.new(params)
 
     connect! if connect_on_start
   end
@@ -55,11 +55,7 @@ class ActionCableClient
   # @param [String] action - how the message is being sent
   # @param [Hash] data - the message to be sent to the channel
   def perform(action, data)
-    if _queued_send
-      message_queue.push([action, data])
-    else
-      dispatch_message(action, data)
-    end
+    dispatch_message(action, data)
   end
 
   # callback for received messages as well as
@@ -179,8 +175,6 @@ class ActionCableClient
       #       maybe just make it extensible?
       yield(json)
     end
-
-    deplete_queue if _queued_send
   end
 
   # {"identifier" => "_ping","type" => "confirm_subscription"}
@@ -202,17 +196,6 @@ class ActionCableClient
   def subscribe
     msg = _message_factory.create(Commands::SUBSCRIBE)
     send_msg(msg.to_json)
-  end
-
-  def deplete_queue
-    # if we haven't yet subscribed, don't deplete the queue
-    if subscribed?
-      # only try to send if we have messages to send
-      until message_queue.empty?
-        action, data = message_queue.pop
-        dispatch_message(action, data)
-      end
-    end
   end
 
   def dispatch_message(action, data)

@@ -51,10 +51,10 @@ The available hooks to tie in to are:
  - `received { |msg }`
 
 
-Connecting on initialization is also configurable.
+#### Connecting on initialization is also configurable.
 
 ```ruby
-client = ActionCableClient.new(uri, channel, false, connect_on_start: false)
+client = ActionCableClient.new(uri, 'RoomChannel', connect_on_start: false)
 client.connect!
 ```
 
@@ -72,6 +72,22 @@ To reconnect,
 ```ruby
 client.connect!
 ```
+
+#### Sending additional params
+
+```ruby
+params = { channel: 'RoomChannel', favorite_color: 'blue' }
+client = ActionCableClient.new(uri, params)
+```
+
+then on the server end, in your Channel, `params` will give you:
+```
+{
+       "channel" => "RoomChannel",
+"favorite_color" => "blue"
+}
+```
+
 
 ## Demo
 
