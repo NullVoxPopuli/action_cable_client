@@ -52,17 +52,6 @@ describe ActionCableClient::Message do
     end
 
     context '#perform' do
-      context 'queueing is enabled' do
-        before(:each) do
-          allow(@client).to receive(:_queued_send) { true }
-        end
-
-        it 'adds to the queue' do
-          @client.perform('action', {})
-          expect(@client.message_queue.count).to eq 1
-        end
-      end
-
       it 'does not add to the queue' do
         @client.perform('action', {})
         expect(@client.message_queue.count).to eq 0
@@ -127,21 +116,6 @@ describe ActionCableClient::Message do
 
     context '#disconnected' do
       it 'sets subscribed to false' do
-      end
-    end
-
-    context '#deplete_queue' do
-      context 'queuing is enabled' do
-        before(:each) do
-          allow(@client).to receive(:_queued_send) { true }
-          @client._subscribed = true
-        end
-        it 'clears the queue' do
-          @client.perform('action', {})
-
-          @client.send(:deplete_queue)
-          expect(@client.message_queue.count).to eq 0
-        end
       end
     end
 

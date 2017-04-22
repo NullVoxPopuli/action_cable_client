@@ -5,7 +5,13 @@ describe ActionCableClient::MessageFactory do
   it 'initializes with a channel name' do
     factory = ActionCableClient::MessageFactory.new('chatroom')
 
-    expect(factory._channel).to eq 'chatroom'
+    expect(factory.channel).to eq 'chatroom'
+  end
+
+  it 'requires a proper channel name' do
+    expect {
+      ActionCableClient::MessageFactory.new(nil)
+    }.to raise_error(ActionCableClient::Errors::ChannelNotSpecified)
   end
 
   context '#build_data' do
