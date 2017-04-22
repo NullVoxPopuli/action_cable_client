@@ -1,4 +1,4 @@
-## 2.0 - Unreleased
+## 2.0
 
 **General**
 
