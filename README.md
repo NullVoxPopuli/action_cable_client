@@ -5,8 +5,6 @@
 [![Test Coverage](https://codeclimate.com/github/NullVoxPopuli/action_cable_client/badges/coverage.svg)](https://codeclimate.com/github/NullVoxPopuli/action_cable_client/coverage)
 [![Dependency Status](https://gemnasium.com/badges/github.com/NullVoxPopuli/action_cable_client.svg)](https://gemnasium.com/github.com/NullVoxPopuli/action_cable_client)
 
-Rails has a thin layer on top of web sockets to help manage subscribing to channels and send/receive on channels.
-
 This gem is a wrapper around [websocket-eventmachine-client](https://github.com/imanel/websocket-eventmachine-client), and supports the Rails Action Cable protocol.
 
 ## Usage
