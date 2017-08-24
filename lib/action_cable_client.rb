@@ -23,7 +23,7 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue, :_subscribed, :_subscribed_callaback
+  attr_accessor :message_queue, :_subscribed, :_subscribed_callaback, :_pinged_callback
 
   def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
@@ -138,6 +138,10 @@ class ActionCableClient
     end
   end
 
+  def pinged(&block)
+    self._pinged_callback = block
+  end
+
   private
 
   # @param [String] message - the websockt message object
@@ -148,6 +152,7 @@ class ActionCableClient
     json = JSON.parse(message)
 
     if is_ping?(json)
+      _pinged_callback&.call(json)
       yield(json) unless skip_pings
     elsif !subscribed?
       check_for_subscribe_confirmation(json)

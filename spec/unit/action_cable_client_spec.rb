@@ -26,6 +26,18 @@ describe ActionCableClient::Message do
             @client.send(:handle_received_message, message, false, &b)
           end.to yield_with_args(hash)
         end
+
+        it 'calls _pinged_callback' do
+          result = nil
+
+          @client.pinged do |data|
+            result = data
+          end
+
+          @client.send(:handle_received_message, message)
+
+          expect(result).to eq(hash)
+        end
       end
 
       context 'is not a ping' do
@@ -37,6 +49,12 @@ describe ActionCableClient::Message do
             @client._subscribed = true
             @client.send(:handle_received_message, message, false, &b)
           end.to yield_with_args(hash)
+        end
+
+        it 'does not call _pinged_callback' do
+          expect(@client).to_not receive(:_pinged_callback)
+
+          @client.send(:handle_received_message, message)
         end
       end
 
@@ -117,6 +135,16 @@ describe ActionCableClient::Message do
 
     context '#disconnected' do
       it 'sets subscribed to false' do
+      end
+    end
+
+    context '#pinged' do
+      it 'sets the callback' do
+        expect(@client._pinged_callback).to eq(nil)
+
+        @client.pinged {}
+
+        expect(@client._pinged_callback).to_not eq(nil)
       end
     end
 

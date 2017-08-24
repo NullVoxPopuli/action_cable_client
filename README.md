@@ -42,6 +42,7 @@ The available hooks to tie in to are:
  - `subscribed {}`
  - `errored { |msg| }`
  - `received { |msg }`
+ - `pinged { |msg| }`
 
 
 #### Connecting on initialization is also configurable.
