@@ -70,18 +70,15 @@ class ActionCableClient
   # callback for received messages as well as
   # what triggers depleting the message queue
   #
-  # @param [Boolean] skip_pings - by default, messages
-  #        with the identifier '_ping' are skipped
-  #
   # @example
   #   client = ActionCableClient.new(uri, 'RoomChannel')
   #   client.received do |message|
   #     # the received message will be JSON
   #     puts message
   #   end
-  def received(skip_pings = true)
+  def received
     _websocket_client.onmessage do |message, _type|
-      handle_received_message(message, skip_pings) do |json|
+      handle_received_message(message) do |json|
         yield(json)
       end
     end
@@ -145,15 +142,12 @@ class ActionCableClient
   private
 
   # @param [String] message - the websockt message object
-  # @param [Boolean] skip_pings - by default, messages
-  #        with the identifier '_ping' are skipped
-  def handle_received_message(message, skip_pings = true)
+  def handle_received_message(message)
     return if message.empty?
     json = JSON.parse(message)
 
     if is_ping?(json)
       _pinged_callback&.call(json)
-      yield(json) unless skip_pings
     elsif !subscribed?
       check_for_subscribe_confirmation(json)
     else

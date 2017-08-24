@@ -17,14 +17,8 @@ describe ActionCableClient::Message do
         let(:message) { hash.to_json }
         it 'nothing is yielded' do
           expect do |b|
-            @client.send(:handle_received_message, message, true, &b)
+            @client.send(:handle_received_message, message, &b)
           end.to_not yield_with_args
-        end
-
-        it 'yields the ping' do
-          expect do |b|
-            @client.send(:handle_received_message, message, false, &b)
-          end.to yield_with_args(hash)
         end
 
         it 'calls _pinged_callback' do
@@ -47,7 +41,7 @@ describe ActionCableClient::Message do
         it 'yields whatever' do
           expect do |b|
             @client._subscribed = true
-            @client.send(:handle_received_message, message, false, &b)
+            @client.send(:handle_received_message, message, &b)
           end.to yield_with_args(hash)
         end
 
@@ -64,7 +58,7 @@ describe ActionCableClient::Message do
         it 'dont yield' do
           expect do |b|
             @client._subscribed = true
-            @client.send(:handle_received_message, message, false, &b)
+            @client.send(:handle_received_message, message, &b)
           end.not_to yield_with_args
         end
       end
