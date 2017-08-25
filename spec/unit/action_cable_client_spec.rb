@@ -17,14 +17,20 @@ describe ActionCableClient::Message do
         let(:message) { hash.to_json }
         it 'nothing is yielded' do
           expect do |b|
-            @client.send(:handle_received_message, message, true, &b)
+            @client.send(:handle_received_message, message, &b)
           end.to_not yield_with_args
         end
 
-        it 'yields the ping' do
-          expect do |b|
-            @client.send(:handle_received_message, message, false, &b)
-          end.to yield_with_args(hash)
+        it 'calls _pinged_callback' do
+          result = nil
+
+          @client.pinged do |data|
+            result = data
+          end
+
+          @client.send(:handle_received_message, message)
+
+          expect(result).to eq(hash)
         end
       end
 
@@ -35,8 +41,14 @@ describe ActionCableClient::Message do
         it 'yields whatever' do
           expect do |b|
             @client._subscribed = true
-            @client.send(:handle_received_message, message, false, &b)
+            @client.send(:handle_received_message, message, &b)
           end.to yield_with_args(hash)
+        end
+
+        it 'does not call _pinged_callback' do
+          expect(@client).to_not receive(:_pinged_callback)
+
+          @client.send(:handle_received_message, message)
         end
       end
 
@@ -46,7 +58,7 @@ describe ActionCableClient::Message do
         it 'dont yield' do
           expect do |b|
             @client._subscribed = true
-            @client.send(:handle_received_message, message, false, &b)
+            @client.send(:handle_received_message, message, &b)
           end.not_to yield_with_args
         end
       end
@@ -117,6 +129,16 @@ describe ActionCableClient::Message do
 
     context '#disconnected' do
       it 'sets subscribed to false' do
+      end
+    end
+
+    context '#pinged' do
+      it 'sets the callback' do
+        expect(@client._pinged_callback).to eq(nil)
+
+        @client.pinged {}
+
+        expect(@client._pinged_callback).to_not eq(nil)
       end
     end
 

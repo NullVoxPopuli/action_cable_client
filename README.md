@@ -42,6 +42,7 @@ The available hooks to tie in to are:
  - `subscribed {}`
  - `errored { |msg| }`
  - `received { |msg }`
+ - `pinged { |msg| }`
 
 
 #### Connecting on initialization is also configurable.
@@ -51,14 +52,13 @@ client = ActionCableClient.new(uri, 'RoomChannel', false)
 client.connect!(headers = {})
 ```
 
-this way if you also enable ping receiving via
 ```ruby
-client.received(false) do |json|
-  # now pings will be here as well, because skip_pings is set to false
+client.pinged do |_data|
+  # you could track the time since you last received a ping, if you haven't
+  # received one in a while, it could be that your client is disconnected.
 end
 ```
 
-you could track the time since you last received a ping, if you haven't received one in a while, it could be that your client is disconnected.
 
 To reconnect,
 
@@ -118,8 +118,6 @@ There really isn't that much to this gem. :-)
 
 4. Notes:
   - Every message sent to the server has a `command` and `identifier` key.
-  - Ping messages from the action cable server look like:
-    - `{ "type" => "ping", "message" =>  1461845503 }`
   - The channel value must match the `name` of the channel class on the ActionCable server.
   - `identifier` and `data` are redundantly jsonified. So, for example (in ruby):
 ```ruby
