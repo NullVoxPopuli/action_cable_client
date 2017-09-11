@@ -26,8 +26,7 @@ EventMachine.run do
     puts message
   end
 
-  # adds to a queue that is purged upon receiving of
-  # a ping from the server
+  # Sends a message to the sever, with the 'action', 'speak'
   client.perform('speak', { message: 'hello from amc' })
 end
 ```

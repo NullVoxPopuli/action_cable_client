@@ -1,3 +1,9 @@
+## 2.0.1
+
+**General**
+
+* [#22](https://github.com/NullVoxPopuli/action_cable_client/pull/22) Removed ActiveSupport Dependency (@srabuini)
+
 ## 2.0
 
 **General**
