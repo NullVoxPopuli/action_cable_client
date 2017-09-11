@@ -26,9 +26,20 @@ class ActionCableClient
         identifier: _identifier.to_json
       }
 
-      hash[:data] = _data.to_json if _data.present?
+      hash[:data] = _data.to_json if present?(_data)
 
       hash.to_json
+    end
+
+    private
+
+    def present?(data)
+      case data
+      when String
+        !(data.empty? || /\A[[:space:]]*\z/.match(data))
+      else
+        data.respond_to?(:empty?) ? !data.empty? : !!data
+      end
     end
   end
 end

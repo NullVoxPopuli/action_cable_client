@@ -3,7 +3,6 @@
 # required gems
 require 'websocket-eventmachine-client'
 require 'forwardable'
-require 'active_support/core_ext/string'
 require 'json'
 
 # local files
