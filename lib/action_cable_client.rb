@@ -22,7 +22,7 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue, :_subscribed, :_subscribed_callaback, :_pinged_callback
+  attr_accessor :message_queue, :_subscribed, :_subscribed_callback, :_pinged_callback, :_connected_callback
 
   def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
@@ -91,7 +91,7 @@ class ActionCableClient
   #     # do things after the client is connected to the server
   #   end
   def connected
-    _websocket_client.onopen do
+    self._connected_callback = Proc.new do
       subscribe
       yield
     end
@@ -111,7 +111,7 @@ class ActionCableClient
   #     # do things after successful subscription confirmation
   #   end
   def subscribed(&block)
-    self._subscribed_callaback = block
+    self._subscribed_callback = block
   end
 
   # @return [Boolean] is the client subscribed to the channel?
@@ -147,6 +147,8 @@ class ActionCableClient
 
     if is_ping?(json)
       _pinged_callback&.call(json)
+    elsif is_welcome?(json)
+      _connected_callback&.call(json)
     elsif !subscribed?
       check_for_subscribe_confirmation(json)
     else
@@ -162,7 +164,7 @@ class ActionCableClient
     return unless  Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
 
     self._subscribed = true
-    _subscribed_callaback&.call
+    _subscribed_callback&.call
   end
 
   # {"identifier" => "_ping","message" => 1460201942}
@@ -170,6 +172,12 @@ class ActionCableClient
   def is_ping?(message)
     message_identifier = message[Message::TYPE_KEY]
     Message::IDENTIFIER_PING == message_identifier
+  end
+
+  # {"type" => "welcome"}
+  def is_welcome?(message)
+    message_identifier = message[Message::TYPE_KEY]
+    Message::IDENTIFIER_WELCOME == message_identifier
   end
 
   def subscribe

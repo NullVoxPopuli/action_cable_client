@@ -99,9 +99,9 @@ describe ActionCableClient::Message do
 
     context '#subscribed' do
       it 'sets the callback' do
-        expect(@client._subscribed_callaback).to eq nil
+        expect(@client._subscribed_callback).to eq nil
         @client.subscribed {}
-        expect(@client._subscribed_callaback).to_not eq nil
+        expect(@client._subscribed_callback).to_not eq nil
       end
 
       it 'once the callback is set, receiving a subscription confirmation invokes the callback' do
@@ -110,7 +110,7 @@ describe ActionCableClient::Message do
           callback_called = true
         end
 
-        expect(@client).to receive(:_subscribed_callaback).and_call_original
+        expect(@client).to receive(:_subscribed_callback).and_call_original
         message = { 'identifier' => 'ping', 'type' => 'confirm_subscription' }
         @client.send(:check_for_subscribe_confirmation, message)
         expect(callback_called).to eq true
@@ -118,6 +118,14 @@ describe ActionCableClient::Message do
     end
 
     context '#connected' do
+      it 'sets the callback' do
+        expect(@client._connected_callback).to eq(nil)
+
+        @client.connected {}
+
+        expect(@client._connected_callback).to_not eq(nil)
+      end
+
       it 'subscribes' do
         # TODO: how do I stub a method chain that takes a block?
         # allow{ |b| @client._websocket_client.callback }.to yield_with_no_args
