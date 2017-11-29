@@ -118,6 +118,14 @@ describe ActionCableClient::Message do
     end
 
     context '#connected' do
+      it 'sets the callback' do
+        expect(@client._connected_callback).to eq(nil)
+
+        @client.connected {}
+
+        expect(@client._connected_callback).to_not eq(nil)
+      end
+
       it 'subscribes' do
         # TODO: how do I stub a method chain that takes a block?
         # allow{ |b| @client._websocket_client.callback }.to yield_with_no_args
