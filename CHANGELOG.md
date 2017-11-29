@@ -1,3 +1,7 @@
+## 2.0.2
+
+* [#24](https://github.com/NullVoxPopuli/action_cable_client/pull/24) Fix bug where action cable client is too fast for the server and doesn't wait for the server's welcome message before initiating a channel subscription (@wpp)
+
 ## 2.0.1
 
 **General**
