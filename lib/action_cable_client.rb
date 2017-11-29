@@ -22,7 +22,7 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue, :_subscribed, :_subscribed_callaback, :_pinged_callback
+  attr_accessor :message_queue, :_subscribed, :_subscribed_callback, :_pinged_callback
 
   def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
@@ -111,7 +111,7 @@ class ActionCableClient
   #     # do things after successful subscription confirmation
   #   end
   def subscribed(&block)
-    self._subscribed_callaback = block
+    self._subscribed_callback = block
   end
 
   # @return [Boolean] is the client subscribed to the channel?
@@ -162,7 +162,7 @@ class ActionCableClient
     return unless  Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
 
     self._subscribed = true
-    _subscribed_callaback&.call
+    _subscribed_callback&.call
   end
 
   # {"identifier" => "_ping","message" => 1460201942}
