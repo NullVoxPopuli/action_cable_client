@@ -60,7 +60,7 @@ end
 To reconnect,
 
 ```ruby
-client.connect!
+client.reconnect!
 ```
 
 #### Sending additional params

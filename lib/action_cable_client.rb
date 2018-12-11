@@ -66,6 +66,12 @@ class ActionCableClient
     end
   end
 
+  def reconnect!
+    uri = URI(@_uri)
+    EventMachine.reconnect uri.host, uri.port, @_websocket_client
+    @_websocket_client.post_init
+  end
+
   # @param [String] action - how the message is being sent
   # @param [Hash] data - the message to be sent to the channel
   def perform(action, data)

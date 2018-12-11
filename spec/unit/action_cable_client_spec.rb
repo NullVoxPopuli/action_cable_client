@@ -17,8 +17,11 @@ describe ActionCableClient do
       websocket_client
     end
 
+    let(:host) { 'hostname' }
+    let(:port) { 1234 }
+
     before(:each) do
-      @client = ActionCableClient.new('fakeuri')
+      @client = ActionCableClient.new("ws://#{host}:#{port}")
       allow(@client).to receive(:send_msg) {}
     end
 
@@ -214,6 +217,26 @@ describe ActionCableClient do
         msg = { 'identifier' => 'notping', 'message' => 1_460_201_942 }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq false
+      end
+    end
+
+    context '#reconnect!' do
+      before do
+        allow(EventMachine).to receive(:reconnect)
+        allow(websocket_client).to receive(:post_init)
+      end
+
+      it 'asks EventMachine to reconnect on same host and port' do
+        expect(EventMachine).to receive(:reconnect).with(host, port, websocket_client)
+        @client.reconnect!
+      end
+
+      it 'fires EventMachine::WebSocket::Client #post_init' do
+        # NOTE: in some cases, its required. Have a look to
+        # https://github.com/imanel/websocket-eventmachine-client/issues/14
+        # https://github.com/eventmachine/eventmachine/issues/218
+        expect(websocket_client).to receive(:post_init)
+        @client.reconnect!
       end
     end
   end
