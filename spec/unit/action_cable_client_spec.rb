@@ -3,7 +3,7 @@
 require 'spec_helper'
 require 'ostruct'
 
-describe ActionCableClient::Message do
+describe ActionCableClient do
   context 'with empty WebSocketClient' do
     before(:each) do
       allow(WebSocket::EventMachine::Client).to receive(:connect) {}
