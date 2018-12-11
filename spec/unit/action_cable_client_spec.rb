@@ -169,6 +169,14 @@ describe ActionCableClient do
 
         expect(@client._subscribed).to be false
       end
+
+      it 'sets the callback' do
+        expect(@client._disconnected_callback).to eq(nil)
+
+        @client.disconnected {}
+
+        expect(@client._disconnected_callback).to_not eq(nil)
+      end
     end
 
     context '#pinged' do
