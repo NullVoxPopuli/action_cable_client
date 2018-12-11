@@ -91,7 +91,7 @@ class ActionCableClient
   #     # do things after the client is connected to the server
   #   end
   def connected
-    self._connected_callback = Proc.new do
+    self._connected_callback = proc do
       subscribe
       yield
     end
@@ -143,6 +143,7 @@ class ActionCableClient
   # @param [String] message - the websockt message object
   def handle_received_message(message)
     return if message.empty?
+
     json = JSON.parse(message)
 
     if is_ping?(json)
