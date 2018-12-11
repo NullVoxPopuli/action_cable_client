@@ -91,9 +91,9 @@ class ActionCableClient
   #     # do things after the client is connected to the server
   #   end
   def connected
-    self._connected_callback = proc do
+    self._connected_callback = proc do |json|
       subscribe
-      yield
+      yield(json)
     end
   end
 

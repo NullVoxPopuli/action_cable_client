@@ -52,6 +52,23 @@ describe ActionCableClient do
         end
       end
 
+      context 'is a welcome' do
+        let(:hash) { { 'type' => 'welcome' } }
+        let(:message) { hash.to_json }
+
+        it 'calls _connected_callback' do
+          result = nil
+
+          @client.connected do |data|
+            result = data
+          end
+
+          @client.send(:handle_received_message, message)
+
+          expect(result).to eq(hash)
+        end
+      end
+
       context 'empty messages are ignored' do
         let(:message) { '' }
 
