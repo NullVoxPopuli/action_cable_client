@@ -92,7 +92,6 @@ class ActionCableClient
   #   end
   def connected
     self._connected_callback = proc do |json|
-      subscribe
       yield(json)
     end
   end
@@ -149,6 +148,7 @@ class ActionCableClient
     if is_ping?(json)
       _pinged_callback&.call(json)
     elsif is_welcome?(json)
+      subscribe
       _connected_callback&.call(json)
     elsif !subscribed?
       check_for_subscribe_confirmation(json)

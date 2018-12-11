@@ -67,6 +67,12 @@ describe ActionCableClient do
 
           expect(result).to eq(hash)
         end
+
+        it 'subscribes' do
+          expect(@client).to receive(:subscribe)
+
+          @client.send(:handle_received_message, message)
+        end
       end
 
       context 'empty messages are ignored' do
@@ -141,14 +147,6 @@ describe ActionCableClient do
         @client.connected {}
 
         expect(@client._connected_callback).to_not eq(nil)
-      end
-
-      it 'subscribes' do
-        # TODO: how do I stub a method chain that takes a block?
-        # allow{ |b| @client._websocket_client.callback }.to yield_with_no_args
-        # allow(@client).to receive_message_chain(:_websocket_client, :callback).and_yield(Proc.new{})
-        # expect(@client).to receive(:subscribe)
-        # @client.connected
       end
     end
 
