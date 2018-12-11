@@ -5,8 +5,19 @@ require 'ostruct'
 
 describe ActionCableClient do
   context 'with empty WebSocketClient' do
+    let!(:websocket_client) do
+      websocket_client_class = class_double(WebSocket::EventMachine::Client).as_stubbed_const
+      websocket_client = instance_double(WebSocket::EventMachine::Client)
+
+      allow(websocket_client_class).to receive(:connect).and_return websocket_client
+      allow(websocket_client).to receive(:onclose) do |&block|
+        @websocket_client_onclose_block = block
+      end
+
+      websocket_client
+    end
+
     before(:each) do
-      allow(WebSocket::EventMachine::Client).to receive(:connect) {}
       @client = ActionCableClient.new('fakeuri')
       allow(@client).to receive(:send_msg) {}
     end
@@ -152,6 +163,11 @@ describe ActionCableClient do
 
     context '#disconnected' do
       it 'sets subscribed to false' do
+        @client._subscribed = true
+
+        @websocket_client_onclose_block.call
+
+        expect(@client._subscribed).to be false
       end
     end
 
