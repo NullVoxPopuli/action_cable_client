@@ -1,4 +1,4 @@
-## 3.0.0
+## 3.0.1
 
 * [#27](https://github.com/NullVoxPopuli/action_cable_client/pull/27)
   * Implement reconnect
