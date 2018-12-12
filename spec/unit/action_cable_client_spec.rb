@@ -3,11 +3,25 @@
 require 'spec_helper'
 require 'ostruct'
 
-describe ActionCableClient::Message do
+describe ActionCableClient do
   context 'with empty WebSocketClient' do
+    let!(:websocket_client) do
+      websocket_client_class = class_double(WebSocket::EventMachine::Client).as_stubbed_const
+      websocket_client = instance_double(WebSocket::EventMachine::Client)
+
+      allow(websocket_client_class).to receive(:connect).and_return websocket_client
+      allow(websocket_client).to receive(:onclose) do |&block|
+        @websocket_client_onclose_block = block
+      end
+
+      websocket_client
+    end
+
+    let(:host) { 'hostname' }
+    let(:port) { 1234 }
+
     before(:each) do
-      allow(WebSocket::EventMachine::Client).to receive(:connect) {}
-      @client = ActionCableClient.new('fakeuri')
+      @client = ActionCableClient.new("ws://#{host}:#{port}")
       allow(@client).to receive(:send_msg) {}
     end
 
@@ -47,6 +61,29 @@ describe ActionCableClient::Message do
 
         it 'does not call _pinged_callback' do
           expect(@client).to_not receive(:_pinged_callback)
+
+          @client.send(:handle_received_message, message)
+        end
+      end
+
+      context 'is a welcome' do
+        let(:hash) { { 'type' => 'welcome' } }
+        let(:message) { hash.to_json }
+
+        it 'calls _connected_callback' do
+          result = nil
+
+          @client.connected do |data|
+            result = data
+          end
+
+          @client.send(:handle_received_message, message)
+
+          expect(result).to eq(hash)
+        end
+
+        it 'subscribes' do
+          expect(@client).to receive(:subscribe)
 
           @client.send(:handle_received_message, message)
         end
@@ -125,18 +162,23 @@ describe ActionCableClient::Message do
 
         expect(@client._connected_callback).to_not eq(nil)
       end
-
-      it 'subscribes' do
-        # TODO: how do I stub a method chain that takes a block?
-        # allow{ |b| @client._websocket_client.callback }.to yield_with_no_args
-        # allow(@client).to receive_message_chain(:_websocket_client, :callback).and_yield(Proc.new{})
-        # expect(@client).to receive(:subscribe)
-        # @client.connected
-      end
     end
 
     context '#disconnected' do
       it 'sets subscribed to false' do
+        @client._subscribed = true
+
+        @websocket_client_onclose_block.call
+
+        expect(@client._subscribed).to be false
+      end
+
+      it 'sets the callback' do
+        expect(@client._disconnected_callback).to eq(nil)
+
+        @client.disconnected {}
+
+        expect(@client._disconnected_callback).to_not eq(nil)
       end
     end
 
@@ -175,6 +217,26 @@ describe ActionCableClient::Message do
         msg = { 'identifier' => 'notping', 'message' => 1_460_201_942 }
         result = @client.send(:is_ping?, msg)
         expect(result).to eq false
+      end
+    end
+
+    context '#reconnect!' do
+      before do
+        allow(EventMachine).to receive(:reconnect)
+        allow(websocket_client).to receive(:post_init)
+      end
+
+      it 'asks EventMachine to reconnect on same host and port' do
+        expect(EventMachine).to receive(:reconnect).with(host, port, websocket_client)
+        @client.reconnect!
+      end
+
+      it 'fires EventMachine::WebSocket::Client #post_init' do
+        # NOTE: in some cases, its required. Have a look to
+        # https://github.com/imanel/websocket-eventmachine-client/issues/14
+        # https://github.com/eventmachine/eventmachine/issues/218
+        expect(websocket_client).to receive(:post_init)
+        @client.reconnect!
       end
     end
   end

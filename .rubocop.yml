@@ -1,5 +1,5 @@
 AllCops:
-  TargetRubyVersion: 2.4
+  TargetRubyVersion: 2.3
   Exclude:
     - config/initializers/forbidden_yaml.rb
     - !ruby/regexp /(vendor|bundle|bin|db|tmp)\/.*/
@@ -42,7 +42,7 @@ Metrics/MethodLength:
 Metrics/PerceivedComplexity:
   Max: 9 # TODO: Lower to 7
 
-Style/AlignParameters:
+Layout/AlignParameters:
   EnforcedStyle: with_fixed_indentation
 
 Style/ClassAndModuleChildren:
@@ -61,14 +61,14 @@ Style/MissingElse:
 Style/EmptyElse:
   EnforcedStyle: empty
 
-Style/MultilineOperationIndentation:
+Layout/MultilineOperationIndentation:
   EnforcedStyle: indented
 
 Style/BlockDelimiters:
   Enabled: true
   EnforcedStyle: line_count_based
 
-Style/PredicateName:
+Naming/PredicateName:
   Enabled: false # TODO: enable with correct prefixes
 
 Style/ClassVars:

@@ -16,9 +16,7 @@ EventMachine.run do
 
   uri = "ws://localhost:3000/cable/"
   client = ActionCableClient.new(uri, 'RoomChannel')
-  # the connected callback is required, as it triggers
-  # the actual subscribing to the channel but it can just be
-  # client.connected {}
+  # called whenever a welcome message is received from the server
   client.connected { puts 'successfully connected.' }
 
   # called whenever a message is received from the server
@@ -62,7 +60,7 @@ end
 To reconnect,
 
 ```ruby
-client.connect!
+client.reconnect!
 ```
 
 #### Sending additional params

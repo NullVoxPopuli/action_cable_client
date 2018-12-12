@@ -22,7 +22,8 @@ class ActionCableClient
   attr_reader :_message_factory
   # The queue should store entries in the format:
   # [ action, data ]
-  attr_accessor :message_queue, :_subscribed, :_subscribed_callback, :_pinged_callback, :_connected_callback
+  attr_accessor :message_queue, :_subscribed
+  attr_accessor :_subscribed_callback, :_pinged_callback, :_connected_callback, :_disconnected_callback
 
   def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
@@ -58,6 +59,17 @@ class ActionCableClient
     # - ping - sends a ping
     # - pong - sends a pong
     @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers)
+
+    @_websocket_client.onclose do
+      self._subscribed = false
+      _disconnected_callback&.call
+    end
+  end
+
+  def reconnect!
+    uri = URI(@_uri)
+    EventMachine.reconnect uri.host, uri.port, @_websocket_client
+    @_websocket_client.post_init
   end
 
   # @param [String] action - how the message is being sent
@@ -91,9 +103,8 @@ class ActionCableClient
   #     # do things after the client is connected to the server
   #   end
   def connected
-    self._connected_callback = Proc.new do
-      subscribe
-      yield
+    self._connected_callback = proc do |json|
+      yield(json)
     end
   end
 
@@ -128,8 +139,7 @@ class ActionCableClient
   #     # cleanup after the server disconnects from the client
   #   end
   def disconnected
-    _websocket_client.onclose do
-      self._subscribed = false
+    self._disconnected_callback = proc do
       yield
     end
   end
@@ -143,11 +153,13 @@ class ActionCableClient
   # @param [String] message - the websockt message object
   def handle_received_message(message)
     return if message.empty?
+
     json = JSON.parse(message)
 
     if is_ping?(json)
       _pinged_callback&.call(json)
     elsif is_welcome?(json)
+      subscribe
       _connected_callback&.call(json)
     elsif !subscribed?
       check_for_subscribe_confirmation(json)
