@@ -1,3 +1,11 @@
+## 3.0.0
+
+* [#27](https://github.com/NullVoxPopuli/action_cable_client/pull/27)
+  * Implement reconnect
+  * Fix issue with subscribing only working on initial connection
+  * Additional Tests
+  * Drop support for Ruby 2.2
+
 ## 2.0.2
 
 * [#24](https://github.com/NullVoxPopuli/action_cable_client/pull/24) Fix bug where action cable client is too fast for the server and doesn't wait for the server's welcome message before initiating a channel subscription (@wpp)
