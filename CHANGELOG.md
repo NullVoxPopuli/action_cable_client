@@ -1,6 +1,6 @@
 ## 3.0.1
 
-* [#27](https://github.com/NullVoxPopuli/action_cable_client/pull/27)
+* [#27](https://github.com/NullVoxPopuli/action_cable_client/pull/27) ([@neomilium](https://github.com/neomilium))
   * Implement reconnect
   * Fix issue with subscribing only working on initial connection
   * Additional Tests
@@ -8,13 +8,13 @@
 
 ## 2.0.2
 
-* [#24](https://github.com/NullVoxPopuli/action_cable_client/pull/24) Fix bug where action cable client is too fast for the server and doesn't wait for the server's welcome message before initiating a channel subscription (@wpp)
+* [#24](https://github.com/NullVoxPopuli/action_cable_client/pull/24) Fix bug where action cable client is too fast for the server and doesn't wait for the server's welcome message before initiating a channel subscription ([@wpp](https://github.com/wpp))
 
 ## 2.0.1
 
 **General**
 
-* [#22](https://github.com/NullVoxPopuli/action_cable_client/pull/22) Removed ActiveSupport Dependency (@srabuini)
+* [#22](https://github.com/NullVoxPopuli/action_cable_client/pull/22) Removed ActiveSupport Dependency ([@srabuini](https://github.com/srabuini))
 
 ## 2.0
 
