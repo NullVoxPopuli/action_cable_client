@@ -88,6 +88,16 @@ client = ActionCableClient.new(uri, params, true, {
 })
 ```
 
+#### Using TLS
+
+Example given for client certificate authentication. See EventMachine::Connection#start_tls documentation for other options. 
+
+```ruby
+params = { channel: 'RoomChannel', favorite_color: 'blue' }
+tls = {cert_chain_file: 'user.crt', private_key_file: 'user.key'}
+client = ActionCableClient.new(uri, params, true, nil, tls)
+```
+
 
 ## Demo
 

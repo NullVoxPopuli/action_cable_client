@@ -35,17 +35,18 @@ class ActionCableClient
   # @param [Boolean] connect_on_start - connects on init when true
   #                                   - otherwise manually call `connect!`
   # @param [Hash] headers - HTTP headers to use in the handshake
-  def initialize(uri, params = '', connect_on_start = true, headers = {})
+  # @param [Hash] tls - TLS options hash to be passed to EM start_tls
+  def initialize(uri, params = '', connect_on_start = true, headers = {}, tls = {})
     @_uri = uri
     @message_queue = []
     @_subscribed = false
 
     @_message_factory = MessageFactory.new(params)
 
-    connect!(headers) if connect_on_start
+    connect!(headers, tls) if connect_on_start
   end
 
-  def connect!(headers = {})
+  def connect!(headers = {}, tls = {})
     # Quick Reference for WebSocket::EM::Client's api
     # - onopen - called after successfully connecting
     # - onclose - called after closing connection
@@ -58,7 +59,7 @@ class ActionCableClient
     # - close - closes the connection and optionally sends close frame to server. `close(code, data)`
     # - ping - sends a ping
     # - pong - sends a pong
-    @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers)
+    @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers, tls: tls)
 
     @_websocket_client.onclose do
       self._subscribed = false
