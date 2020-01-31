@@ -9,6 +9,7 @@ class ActionCableClient
     # TODO: find a better place for this constant
     TYPE_KEY = 'type'
     TYPE_CONFIRM_SUBSCRIPTION = 'confirm_subscription'
+    TYPE_REJECT_SUBSCRIPTION = 'reject_subscription'
 
     attr_reader :_command, :_identifier, :_data
 

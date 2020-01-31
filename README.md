@@ -37,6 +37,7 @@ The available hooks to tie in to are:
  - `disconnected {}`
  - `connected {}`
  - `subscribed {}`
+ - `rejected {}`
  - `errored { |msg| }`
  - `received { |msg }`
  - `pinged { |msg| }`
