@@ -89,6 +89,23 @@ describe ActionCableClient do
         end
       end
 
+      context 'is a rejection' do
+        let(:hash) { { 'type' => 'reject_subscription' } }
+        let(:message) { hash.to_json }
+
+        it 'calls _rejected_callback' do
+          result = nil
+
+          @client.rejected do |data|
+            result = data
+          end
+
+          @client.send(:handle_received_message, message)
+
+          expect(result).to eq(hash)
+        end
+      end
+
       context 'empty messages are ignored' do
         let(:message) { '' }
 

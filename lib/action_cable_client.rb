@@ -23,7 +23,7 @@ class ActionCableClient
   # The queue should store entries in the format:
   # [ action, data ]
   attr_accessor :message_queue, :_subscribed
-  attr_accessor :_subscribed_callback, :_pinged_callback, :_connected_callback, :_disconnected_callback
+  attr_accessor :_subscribed_callback, :_rejected_callback, :_pinged_callback, :_connected_callback, :_disconnected_callback
 
   def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
@@ -109,6 +109,19 @@ class ActionCableClient
     end
   end
 
+  # callback when the server rejects the subscription
+  #
+  # @example
+  #   client = ActionCableClient.new(uri, 'RoomChannel')
+  #   client.rejected do
+  #     # do things after the server rejects the subscription
+  #   end
+  def rejected
+    self._rejected_callback = proc do |json|
+      yield(json)
+    end
+  end
+
   # callback when the client receives a confirm_subscription message
   # from the action_cable server.
   # This is only called once, and signifies that you can now send
@@ -162,6 +175,8 @@ class ActionCableClient
     elsif is_welcome?(json)
       subscribe
       _connected_callback&.call(json)
+    elsif is_rejection?(json)
+      _rejected_callback&.call(json)
     elsif !subscribed?
       check_for_subscribe_confirmation(json)
     else
@@ -174,7 +189,7 @@ class ActionCableClient
   # {"identifier" => "_ping","type" => "confirm_subscription"}
   def check_for_subscribe_confirmation(message)
     message_type = message[Message::TYPE_KEY]
-    return unless  Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
+    return unless Message::TYPE_CONFIRM_SUBSCRIPTION == message_type
 
     self._subscribed = true
     _subscribed_callback&.call
@@ -191,6 +206,11 @@ class ActionCableClient
   def is_welcome?(message)
     message_identifier = message[Message::TYPE_KEY]
     Message::IDENTIFIER_WELCOME == message_identifier
+  end
+
+  def is_rejection?(message)
+    message_type = message[Message::TYPE_KEY]
+    Message::TYPE_REJECT_SUBSCRIPTION == message_type
   end
 
   def subscribe
