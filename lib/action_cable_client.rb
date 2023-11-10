@@ -61,9 +61,9 @@ class ActionCableClient
     # - pong - sends a pong
     @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers, tls: tls)
 
-    @_websocket_client.onclose do
+    @_websocket_client.onclose do |code, reason|
       self._subscribed = false
-      _disconnected_callback&.call
+      _disconnected_callback&.call(code, reason)
     end
   end
 
@@ -152,10 +152,8 @@ class ActionCableClient
   #   client.disconnected do
   #     # cleanup after the server disconnects from the client
   #   end
-  def disconnected
-    self._disconnected_callback = proc do
-      yield
-    end
+  def disconnected(&block)
+    self._disconnected_callback = block
   end
 
   def pinged(&block)
