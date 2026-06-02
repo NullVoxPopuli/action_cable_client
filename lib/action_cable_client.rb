@@ -24,8 +24,9 @@ class ActionCableClient
   # [ action, data ]
   attr_accessor :message_queue, :_subscribed
   attr_accessor :_subscribed_callback, :_rejected_callback, :_pinged_callback, :_connected_callback, :_disconnected_callback
+  attr_accessor :_received_callback, :_errored_callback, :_headers, :_tls
+  attr_accessor :_connection_id
 
-  def_delegator :_websocket_client, :onerror, :errored
   def_delegator :_websocket_client, :send, :send_msg
 
   # @param [String] uri - e.g.: ws://domain:port
@@ -40,6 +41,9 @@ class ActionCableClient
     @_uri = uri
     @message_queue = []
     @_subscribed = false
+    @_connection_id = 0
+    @_headers = headers
+    @_tls = tls
 
     @_message_factory = MessageFactory.new(params)
 
@@ -47,6 +51,10 @@ class ActionCableClient
   end
 
   def connect!(headers = {}, tls = {})
+    self._headers = headers
+    self._tls = tls
+    self._connection_id += 1
+    connection_id = _connection_id
     # Quick Reference for WebSocket::EM::Client's api
     # - onopen - called after successfully connecting
     # - onclose - called after closing connection
@@ -62,15 +70,21 @@ class ActionCableClient
     @_websocket_client = WebSocket::EventMachine::Client.connect(uri: @_uri, headers: headers, tls: tls)
 
     @_websocket_client.onclose do
-      self._subscribed = false
-      _disconnected_callback&.call
+      if connection_id == _connection_id
+        self._subscribed = false
+        _disconnected_callback&.call
+      end
     end
+
+    attach_received_callback
+    attach_errored_callback
   end
 
   def reconnect!
-    uri = URI(@_uri)
-    EventMachine.reconnect uri.host, uri.port, @_websocket_client
-    @_websocket_client.post_init
+    self._connection_id += 1
+    _websocket_client.close if _websocket_client.respond_to?(:close)
+    self._subscribed = false
+    connect!(_headers, _tls)
   end
 
   # @param [String] action - how the message is being sent
@@ -89,11 +103,13 @@ class ActionCableClient
   #     puts message
   #   end
   def received
-    _websocket_client.onmessage do |message, _type|
-      handle_received_message(message) do |json|
-        yield(json)
-      end
-    end
+    self._received_callback = proc { |json| yield(json) }
+    attach_received_callback
+  end
+
+  def errored
+    self._errored_callback = proc { |error| yield(error) }
+    attach_errored_callback
   end
 
   # callback when the client connects to the server
@@ -163,6 +179,22 @@ class ActionCableClient
   end
 
   private
+
+  def attach_received_callback
+    return unless _received_callback
+
+    connection_id = _connection_id
+    _websocket_client.onmessage do |message, _type|
+      handle_received_message(message, &_received_callback) if connection_id == _connection_id
+    end
+  end
+
+  def attach_errored_callback
+    return unless _errored_callback
+
+    connection_id = _connection_id
+    _websocket_client.onerror { |error| _errored_callback.call(error) if connection_id == _connection_id }
+  end
 
   # @param [String] message - the websockt message object
   def handle_received_message(message)
