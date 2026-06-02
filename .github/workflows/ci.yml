@@ -13,7 +13,6 @@ jobs:
   test:
     name: Test Ruby ${{ matrix.ruby }}
     runs-on: ubuntu-22.04
-    continue-on-error: ${{ matrix.experimental }}
     strategy:
       fail-fast: false
       matrix:
@@ -23,11 +22,6 @@ jobs:
           - '2.5'
           - '2.6'
           - '2.7'
-        experimental:
-          - false
-        include:
-          - ruby: head
-            experimental: true
 
     steps:
       - uses: actions/checkout@v4
