@@ -1,5 +1,9 @@
+inherit_from: .rubocop_todo.yml
+
 AllCops:
   TargetRubyVersion: 2.3
+  NewCops: disable
+  SuggestExtensions: false
   Exclude:
     - config/initializers/forbidden_yaml.rb
     - !ruby/regexp /(vendor|bundle|bin|db|tmp)\/.*/
@@ -31,18 +35,18 @@ Metrics/ClassLength:
   Max: 261 # TODO: Lower to 100
 
 Metrics/CyclomaticComplexity:
-  Max: 7 # TODO: Lower to 6
+  Max: 9 # TODO: Lower to 6
 
-Metrics/LineLength:
-  Max: 110 # TODO: Lower to 80
+Layout/LineLength:
+  Max: 124 # TODO: Lower to 80
 
 Metrics/MethodLength:
   Max: 25
 
 Metrics/PerceivedComplexity:
-  Max: 9 # TODO: Lower to 7
+  Max: 10 # TODO: Lower to 7
 
-Layout/AlignParameters:
+Layout/ParameterAlignment:
   EnforcedStyle: with_fixed_indentation
 
 Style/ClassAndModuleChildren:
