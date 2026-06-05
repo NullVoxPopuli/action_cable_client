@@ -5,14 +5,17 @@ require 'ostruct'
 
 describe ActionCableClient do
   context 'with empty WebSocketClient' do
+    let!(:websocket_client_class) { class_double(WebSocket::EventMachine::Client).as_stubbed_const }
     let!(:websocket_client) do
-      websocket_client_class = class_double(WebSocket::EventMachine::Client).as_stubbed_const
       websocket_client = instance_double(WebSocket::EventMachine::Client)
 
       allow(websocket_client_class).to receive(:connect).and_return websocket_client
       allow(websocket_client).to receive(:onclose) do |&block|
         @websocket_client_onclose_block = block
       end
+      allow(websocket_client).to receive(:onmessage)
+      allow(websocket_client).to receive(:onerror)
+      allow(websocket_client).to receive(:close)
 
       websocket_client
     end
@@ -238,22 +241,119 @@ describe ActionCableClient do
     end
 
     context '#reconnect!' do
-      before do
-        allow(EventMachine).to receive(:reconnect)
-        allow(websocket_client).to receive(:post_init)
+      let(:reconnected_websocket_client) do
+        client = instance_double(WebSocket::EventMachine::Client)
+        allow(client).to receive(:onclose)
+        allow(client).to receive(:onmessage)
+        allow(client).to receive(:onerror)
+        allow(client).to receive(:close)
+        client
       end
 
-      it 'asks EventMachine to reconnect on same host and port' do
-        expect(EventMachine).to receive(:reconnect).with(host, port, websocket_client)
-        @client.reconnect!
+      it 'closes the old websocket and connects a new one with the same connection options' do
+        headers = { 'Authorization' => 'Bearer token' }
+        tls = { cert_chain_file: 'user.crt' }
+        client = ActionCableClient.new("ws://#{host}:#{port}", 'RoomChannel', true, headers, tls)
+
+        expect(client._websocket_client).to receive(:close)
+        expect(websocket_client_class).to receive(:connect).with(
+          uri: "ws://#{host}:#{port}",
+          headers: headers,
+          tls: tls
+        ).and_return(reconnected_websocket_client)
+
+        client.reconnect!
+
+        expect(client._websocket_client).to eq(reconnected_websocket_client)
+        expect(client.subscribed?).to eq false
       end
 
-      it 'fires EventMachine::WebSocket::Client #post_init' do
-        # NOTE: in some cases, its required. Have a look to
-        # https://github.com/imanel/websocket-eventmachine-client/issues/14
-        # https://github.com/eventmachine/eventmachine/issues/218
-        expect(websocket_client).to receive(:post_init)
+      it 'reattaches the received callback to the new websocket' do
+        received_messages = []
+        connected_messages = []
+
+        @client.received do |message|
+          received_messages << message
+        end
+        @client.connected do |message|
+          connected_messages << message
+        end
+
+        allow(reconnected_websocket_client).to receive(:onmessage) do |&block|
+          @reconnected_onmessage_block = block
+        end
+        expect(websocket_client_class).to receive(:connect).and_return(reconnected_websocket_client)
+
         @client.reconnect!
+
+        message = { 'type' => 'welcome' }
+        @reconnected_onmessage_block.call(message.to_json, nil)
+
+        expect(connected_messages).to eq([message])
+        expect(received_messages).to eq([])
+      end
+
+      it 'ignores stale callbacks from the old websocket after reconnecting' do
+        connected_messages = []
+
+        @client.received {}
+        @client.connected do |message|
+          connected_messages << message
+        end
+
+        allow(websocket_client).to receive(:onmessage) do |&block|
+          @old_onmessage_block = block
+        end
+        @client.received {}
+
+        expect(websocket_client_class).to receive(:connect).and_return(reconnected_websocket_client)
+
+        @client.reconnect!
+
+        @client._subscribed = true
+        @websocket_client_onclose_block.call
+        @old_onmessage_block.call({ 'type' => 'welcome' }.to_json, nil)
+
+        expect(@client.subscribed?).to eq true
+        expect(connected_messages).to eq([])
+      end
+
+      it 'ignores the old websocket close callback if close fires it during reconnect' do
+        disconnected_calls = []
+
+        @client._subscribed = true
+        @client.disconnected do
+          disconnected_calls << true
+        end
+
+        allow(websocket_client).to receive(:close) do
+          @websocket_client_onclose_block.call
+        end
+        expect(websocket_client_class).to receive(:connect).and_return(reconnected_websocket_client)
+
+        @client.reconnect!
+
+        expect(disconnected_calls).to eq([])
+        expect(@client._websocket_client).to eq(reconnected_websocket_client)
+      end
+
+      it 'reattaches the errored callback to the new websocket' do
+        errors = []
+
+        @client.errored do |error|
+          errors << error
+        end
+
+        allow(reconnected_websocket_client).to receive(:onerror) do |&block|
+          @reconnected_onerror_block = block
+        end
+        expect(websocket_client_class).to receive(:connect).and_return(reconnected_websocket_client)
+
+        @client.reconnect!
+
+        @reconnected_onerror_block.call('connection failed')
+
+        expect(errors).to eq(['connection failed'])
       end
     end
   end
