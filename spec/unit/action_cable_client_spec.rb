@@ -318,6 +318,25 @@ describe ActionCableClient do
         expect(connected_messages).to eq([])
       end
 
+      it 'ignores the old websocket close callback if close fires it during reconnect' do
+        disconnected_calls = []
+
+        @client._subscribed = true
+        @client.disconnected do
+          disconnected_calls << true
+        end
+
+        allow(websocket_client).to receive(:close) do
+          @websocket_client_onclose_block.call
+        end
+        expect(websocket_client_class).to receive(:connect).and_return(reconnected_websocket_client)
+
+        @client.reconnect!
+
+        expect(disconnected_calls).to eq([])
+        expect(@client._websocket_client).to eq(reconnected_websocket_client)
+      end
+
       it 'reattaches the errored callback to the new websocket' do
         errors = []
 
